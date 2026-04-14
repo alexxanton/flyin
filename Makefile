@@ -16,7 +16,7 @@ $(INSTALL): requirements.txt
 
 run: install
 	@echo "Running the project..."
-	$(VENV_BIN)/python $(MAIN)
+	$(VENV_BIN)/python $(MAIN) config.txt
 
 venv:
 	@if [ ! -d "$(VENV)" ]; then \

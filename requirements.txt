@@ -1,1 +1,4 @@
 lark
+flake8
+mypy
+pygame
