@@ -23,3 +23,7 @@ class Hub(Entity):
         self._zone: str = zone
         self._color: str = color
         self._max_drones: int = max_drones
+
+    @property
+    def color(self) -> str:
+        return self._color
