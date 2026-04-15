@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 
 
 class DroneNetwork:
+    """Represents a network of drones."""
     def __init__(self) -> None:
         self._nb_drones: int = 0
         self._hubs: List[Hub] = []
@@ -17,7 +18,7 @@ class DroneNetwork:
 
     def _add_entity(self, line: Dict[str, Any]) -> None:
         if "hub" in line["type"]:
-            self._hubs.append(Hub(*line["params"]))
+            self._hubs.append(Hub(*line["params"], **line["metadata"]))
         elif line["type"] == "connection":
             from_hub, to_hub = line["params"]
-            self._connections.append(Connection())
+            self._connections.append(Connection(**line["metadata"]))

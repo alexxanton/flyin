@@ -31,6 +31,11 @@ class DroneTransformer(Transformer):
             str(args[0]), int(args[1]) if args[1].isnumeric() else str(args[1])
         )
 
+    def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
+        if not args:
+            return {}
+        return args[0]
+
     def attributes(self, args: List[Any]) -> Dict[str, Any]:
         attrs = {}
         for k, v in args:

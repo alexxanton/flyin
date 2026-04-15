@@ -10,9 +10,10 @@ drone_grammar = r"""
     ?line: hub_line | connection_line
 
     nb_drones: "nb_drones:" INT
-    hub_line: HUB_TYPE ":" name_coord [attributes]
-    connection_line: "connection:" NAME "-" NAME [attributes]
+    hub_line: HUB_TYPE ":" name_coord metadata
+    connection_line: "connection:" NAME "-" NAME metadata
 
+    metadata: attributes?
     name_coord: NAME INT INT
     attributes: "[" pair (pair)* "]"
     pair: NAME "=" (NAME | INT)

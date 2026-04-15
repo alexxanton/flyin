@@ -12,7 +12,7 @@ class Simulation:
         data = parse_data(sys.argv[1])
         network = DroneNetwork()
         network.create_network(data)
-        renderer = Renderer(400, 300)
+        renderer = Renderer(800, 600)
         while True:
             renderer.display()
             if renderer.handle_events() == "quit":
