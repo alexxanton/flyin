@@ -5,6 +5,7 @@ from .drone import Drone
 
 
 class Hub(Entity):
+    """Represents a hub for the drones where they have to travel to."""
     def __init__(
         self,
         name: str,
@@ -19,6 +20,6 @@ class Hub(Entity):
         self._connected_from: List[Hub] = []
         self._connected_to: List[Hub] = []
         self._drones: List[Drone] = []
-        self._zone: str = zone,
-        self._color: str = color,
+        self._zone: str = zone
+        self._color: str = color
         self._max_drones: int = max_drones
