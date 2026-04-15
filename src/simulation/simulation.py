@@ -10,8 +10,9 @@ class Simulation:
         if len(sys.argv) < 2:
             sys.exit("Config file not provided.")
         data = parse_data(sys.argv[1])
+        network = DroneNetwork()
+        network.create_network(data)
         renderer = Renderer(400, 300)
-        network = DroneNetwork(data)
         while True:
             renderer.display()
             if renderer.handle_events() == "quit":
