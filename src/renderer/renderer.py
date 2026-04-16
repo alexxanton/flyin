@@ -12,7 +12,7 @@ class Renderer:
         self._width: int = width
         self._height: int = height
         self._network: DroneNetwork = network
-        self._screen: pygame.Surface = pygame.display.set_mode((width, height))
+        self._screen: pygame.Surface = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         self._clock: pygame.time.Clock = pygame.time.Clock()
         self._fps: int = 60
         self._frame: float = 0.0

@@ -34,7 +34,7 @@ class DroneTransformer(Transformer):
     def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
         if not args:
             return {}
-        return args[0]
+        return dict(args[0])
 
     def attributes(self, args: List[Any]) -> Dict[str, Any]:
         attrs = {}
