@@ -9,6 +9,7 @@ class Entity:
         self._x: int = x
         self._y: int = y
 
-    def get_pos(self) -> Tuple[int, int]:
+    @property
+    def pos(self) -> Tuple[int, int]:
         """Return the entity position."""
         return (self._x, self._y)
