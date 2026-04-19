@@ -9,14 +9,14 @@ drone_grammar = r"""
 
     ?line: hub_line | connection_line
 
-    nb_drones: "nb_drones:" INT
+    nb_drones: "nb_drones:" SIGNED_INT
     hub_line: HUB_TYPE ":" name_coord metadata
     connection_line: "connection:" NAME "-" NAME metadata
 
     metadata: attributes?
-    name_coord: NAME INT INT
+    name_coord: NAME SIGNED_INT SIGNED_INT
     attributes: "[" pair (pair)* "]"
-    pair: NAME "=" (NAME | INT)
+    pair: NAME "=" (NAME | SIGNED_INT)
 
     HUB_TYPE: "start_hub" | "end_hub" | "hub"
     NAME: /[a-zA-Z0-9_]+/
@@ -24,7 +24,7 @@ drone_grammar = r"""
     NEWLINE: /\r?\n+/
     _nl: (NEWLINE | COMMENT)
 
-    %import common.INT
+    %import common.SIGNED_INT
     %import common.WS
     %ignore COMMENT
     %ignore WS
