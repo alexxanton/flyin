@@ -12,18 +12,30 @@ class Renderer:
         self._width: int = width
         self._height: int = height
         self._network: DroneNetwork = network
-        self._screen: pygame.Surface = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+        self._screen: pygame.Surface = pygame.display.set_mode(
+            (width, height), pygame.RESIZABLE
+        )
         self._clock: pygame.time.Clock = pygame.time.Clock()
         self._fps: int = 60
         self._frame: float = 0.0
 
-        self._max_x: int = max([hub.get_pos()[0] for hub in network.hubs])
-        self._max_y: int = max([hub.get_pos()[1] for hub in network.hubs])
-        self._min_x: int = min([hub.get_pos()[0] for hub in network.hubs])
-        self._min_y: int = min([hub.get_pos()[1] for hub in network.hubs])
+        xs, ys = zip(*(hub.pos for hub in network.hubs))
+        self._max_x: int = max(xs)
+        self._min_x: int = min(xs)
+        self._max_y: int = max(ys)
+        self._min_y: int = min(ys)
+        self._diff_x: int = abs(self._min_x) if self._min_x < 0 else 0
+        self._diff_y: int = abs(self._min_y) if self._min_y < 0 else 0
+        self._max_x += self._diff_x
+        self._max_y += self._diff_y
+        if self._max_x:
+            self._min_x = 0
+        if self._max_y:
+            self._min_y = 0
 
-        self._drone_frames: List[pygame.Surface] = self._load_drone_sprites()
-        self._hub_frames: Dict[str, pygame.Surface] = self._load_hub_sprites()
+        self._drone_sprites: List[pygame.Surface] = self._load_drone_sprites()
+        self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
+        self._sprite_size: int = 64
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:
         path: Path = Path("src/renderer/sprites/hub_sprites")
@@ -41,15 +53,56 @@ class Renderer:
             for file in files
         ]
 
-    def display(self) -> None:
-        self._screen.fill((0, 0, 0))
-        width, height = self._screen.get_size()
+    def _translate_pos(
+        self,
+        screen_size: Tuple[int, int],
+        pos: Tuple[int, int],
+        line: bool=False
+    ) -> Tuple[int, int]:
+        x, y = pos
+        width, height = screen_size
+        max_x, max_y = self._max_x, self._max_y
+        min_x, min_y = self._min_x, self._min_y
+        offset = self._sprite_size
+        x += self._diff_x
+        y += self._diff_y
+        line_offset = self._sprite_size // 2 if line else 0
+        x = (x - min_x) * ((width - offset) // max_x) + line_offset
+        y = (y - min_y) * ((height - offset) // max_y) + line_offset
+        return x, y
 
-        def translate_pos(pos: Tuple[int, int]) -> Tuple[int, int]:
-            x, y = pos
-            x = (x - self._min_x) * ((width - 64) // self._max_x)
-            y = (y - self._min_y) * ((height - 64) // self._max_y)
-            return x, y
+    def display(self) -> None:
+        self._screen.fill("0x222034")
+        screen_size = self._screen.get_size()
+
+        def draw_edges() -> None:
+            edges = self._network.edges
+            for edge in edges:
+                transparent_layer: pygame.Surface = pygame.Surface(
+                    self._screen.get_size(), pygame.SRCALPHA
+                )
+                start, end = (
+                    self._translate_pos(screen_size, hub.pos, line=True)
+                    for hub in edge.hubs
+                )
+                try:
+                    color: pygame.Color = pygame.Color(edge.hubs[1].color)
+                    color.a = 50
+                except (ValueError, TypeError):
+                    color = "0x111111"
+                pygame.draw.line(transparent_layer, color, start, end, 5)
+                self._screen.blit(transparent_layer, (0, 0))
+
+        def draw_hubs() -> None:
+            for hub in self._network.hubs:
+                pos: Tuple[int, int] = self._translate_pos(
+                    screen_size, hub.pos
+                )
+                sprite: pygame.Surface = self._drone_sprites[round(self._frame) % 4]
+                sprite = self._hub_sprites["hub_planet"]
+                sprite = color_image(sprite, hub.color)
+                #sprite = pygame.transform.scale(sprite, (128, 128))
+                self._screen.blit(sprite, pos)
 
         def color_image(image: pygame.Surface, color: str) -> pygame.Surface:
             temp: pygame.Surface = image.copy()
@@ -61,13 +114,8 @@ class Renderer:
 
         self._clock.tick(self._fps)
         self._frame += 0.2
-        for hub in self._network.hubs:
-            pos: Tuple[int, int] = translate_pos(hub.get_pos())
-            sprite: pygame.Surface = self._drone_frames[round(self._frame) % 4]
-            sprite = self._hub_frames["hub_planet"]
-            sprite = color_image(sprite, hub.color)
-            self._screen.blit(sprite, pos)
-
+        draw_edges()
+        draw_hubs()
         pygame.display.flip()
 
     def handle_events(self) -> str:
