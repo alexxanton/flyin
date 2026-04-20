@@ -7,12 +7,13 @@ import sys
 
 class Simulation:
     def start(self) -> None:
-        if len(sys.argv) < 2:
-            sys.exit("Config file not provided.")
-        data = parse_data(sys.argv[1])
+        renderer = Renderer(800, 600)
+        file = renderer.choose_file()
+        data = parse_data(file)
         network = DroneNetwork()
         network.create_network(data)
-        renderer = Renderer(800, 600, network)
+
+        renderer.start(network)
         while True:
             renderer.display()
             if renderer.handle_events() == "quit":

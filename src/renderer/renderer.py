@@ -2,23 +2,30 @@ import pygame
 from pathlib import Path
 from typing import List, Tuple, Dict
 from src.network import DroneNetwork
+from .menu import Menu
 
 
 class Renderer:
     """Renders the drone network using pygame"""
-    def __init__(self, width: int, height: int, network: DroneNetwork) -> None:
+    def __init__(self, width: int, height: int) -> None:
         pygame.init()
         pygame.display.set_caption("Fly-in Drone-out")
         self._width: int = width
         self._height: int = height
-        self._network: DroneNetwork = network
         self._screen: pygame.Surface = pygame.display.set_mode(
             (width, height), pygame.RESIZABLE
         )
+        self._menu = Menu(self._screen)
         self._clock: pygame.time.Clock = pygame.time.Clock()
         self._fps: int = 60
         self._frame: float = 0.0
 
+        self._drone_sprites: List[pygame.Surface] = self._load_drone_sprites()
+        self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
+        self._sprite_size: int = 64
+
+    def start(self, network: DroneNetwork) -> None:
+        self._network = network
         xs, ys = zip(*(hub.pos for hub in network.hubs))
         self._max_x: int = max(xs)
         self._min_x: int = min(xs)
@@ -32,10 +39,6 @@ class Renderer:
             self._min_x = 0
         if self._max_y:
             self._min_y = 0
-
-        self._drone_sprites: List[pygame.Surface] = self._load_drone_sprites()
-        self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
-        self._sprite_size: int = 64
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:
         path: Path = Path("src/renderer/sprites/hub_sprites")
@@ -67,9 +70,20 @@ class Renderer:
         x += self._diff_x
         y += self._diff_y
         line_offset = self._sprite_size // 2 if line else 0
+        if max_x == 0:
+            max_x = 1
+        if max_y == 0:
+            max_y = 1
         x = (x - min_x) * ((width - offset) // max_x) + line_offset
         y = (y - min_y) * ((height - offset) // max_y) + line_offset
         return x, y
+
+    def choose_file(self) -> str:
+        file = ""
+        while not file:
+            file = self._menu.display_menu()
+        return file
+        #return "config.txt"
 
     def display(self) -> None:
         self._screen.fill("0x222034")
