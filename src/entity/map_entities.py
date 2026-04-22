@@ -43,3 +43,7 @@ class Hub(Entity):
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def zone(self) -> str:
+        return self._zone

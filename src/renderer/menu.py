@@ -5,7 +5,7 @@ import sys
 
 
 class MenuItem:
-    def __init__(self, name: str, path: Path, clickable: bool, depth: bool) -> None:
+    def __init__(self, name: str, path: Path, clickable: bool, depth: int) -> None:
         self._name: str = name
         self._path: Path = path
         self._clickable: bool = clickable
@@ -13,11 +13,11 @@ class MenuItem:
         self._rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
 
     @property
-    def name(self) -> int:
+    def name(self) -> str:
         return self._name
 
     @property
-    def path(self) -> int:
+    def path(self) -> Path:
         return self._path
 
     @property
@@ -25,8 +25,16 @@ class MenuItem:
         return self._depth
 
     @property
-    def is_clickable(self) -> int:
+    def is_clickable(self) -> bool:
         return self._clickable
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return self._rect
+
+    @rect.setter
+    def rect(self, new_rect: pygame.Rect) -> pygame.Rect:
+        self._rect = new_rect
 
 
 class Menu:
@@ -46,7 +54,7 @@ class Menu:
         items: List[MenuItem] = []
 
         if not root.is_dir():
-            return []
+            return [Path(root)]
 
         for f in root.glob("*.txt"):
             items.append(MenuItem(f.name, f, True, 0))
@@ -62,6 +70,7 @@ class Menu:
                 "easy": 0
             }
             return order[p.name]
+
         for folder in sorted(root.iterdir(), key=sort_order):
             if folder.is_dir():
                 items.append(MenuItem(folder.name, folder, False, 0))
@@ -78,6 +87,10 @@ class Menu:
         mouse_pos: Tuple[int, int] = pygame.mouse.get_pos()
         menu_items = self._items
         line_height: int = 40
+
+        if len(self._items) == 1 and not self._items[0].path.is_dir():
+            return self._items[0].path
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

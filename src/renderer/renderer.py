@@ -20,7 +20,8 @@ class Renderer:
         self._fps: int = 60
         self._frame: float = 0.0
 
-        self._drone_sprites: List[pygame.Surface] = self._load_drone_sprites()
+        self._drone_sprites: List[pygame.Surface] = self._load_sprites("drone")
+        self._bg_sprites: List[pygame.Surface] = self._load_sprites("bg")
         self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
         self._sprite_size: int = 64
 
@@ -48,8 +49,8 @@ class Renderer:
             for file in files
         }
 
-    def _load_drone_sprites(self) -> List[pygame.Surface]:
-        path: Path = Path("src/renderer/sprites/drone_sprites")
+    def _load_sprites(self, name: str) -> List[pygame.Surface]:
+        path: Path = Path(f"src/renderer/sprites/{name}_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return [
             pygame.image.load(file).convert_alpha()
@@ -83,7 +84,6 @@ class Renderer:
         while not file:
             file = self._menu.display_menu()
         return file
-        #return "config.txt"
 
     def display(self) -> None:
         self._screen.fill("0x222034")
@@ -91,32 +91,44 @@ class Renderer:
 
         def draw_edges() -> None:
             edges = self._network.edges
+            lines_surface: pygame.Surface = pygame.Surface(
+                self._screen.get_size(), pygame.SRCALPHA
+            )
             for edge in edges:
-                transparent_layer: pygame.Surface = pygame.Surface(
-                    self._screen.get_size(), pygame.SRCALPHA
-                )
-                start, end = (
+                start, end = [
                     self._translate_pos(screen_size, hub.pos, line=True)
                     for hub in edge.hubs
-                )
+                ]
                 try:
                     color: pygame.Color = pygame.Color(edge.hubs[1].color)
                     color.a = 50
                 except (ValueError, TypeError):
                     color = "0x111111"
-                pygame.draw.line(transparent_layer, color, start, end, 5)
-                self._screen.blit(transparent_layer, (0, 0))
+                pygame.draw.line(lines_surface, color, start, end, 5)
+
+            self._screen.blit(lines_surface, (0, 0))
 
         def draw_hubs() -> None:
             for hub in self._network.hubs:
                 pos: Tuple[int, int] = self._translate_pos(
                     screen_size, hub.pos
                 )
-                sprite: pygame.Surface = self._drone_sprites[round(self._frame) % 4]
-                sprite = self._hub_sprites["hub_planet"]
+                sprite = self._hub_sprites[hub.zone]
                 sprite = color_image(sprite, hub.color)
                 #sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, pos)
+
+        def draw_drones() -> None:
+            sprites_len: int = len(self._drone_sprites)
+            for drone in self._network.drones:
+                pos: Tuple[int, int] = self._translate_pos(
+                    screen_size, drone.pos
+                )
+                sprite: pygame.Surface = (
+                    self._drone_sprites[round(self._frame) % sprites_len]
+                )
+                x, y = pos
+                self._screen.blit(sprite, (x, y - 20))
 
         def color_image(image: pygame.Surface, color: str) -> pygame.Surface:
             temp: pygame.Surface = image.copy()
@@ -126,10 +138,28 @@ class Renderer:
                 pass
             return temp
 
+        def draw_bg() -> None:
+            screen_width, screen_height = screen_size
+            sprites_len: int = len(self._bg_sprites)
+            bg: pygame.Surface = (
+                self._bg_sprites[round(self._frame / 10) % sprites_len]
+            )
+
+            for y in range(0, screen_height, self._sprite_size):
+                for x in range(0, screen_width, self._sprite_size):
+                    if (x + y) % 3:
+                        continue
+                    x_pos = x + (self._frame % (screen_width + self._sprite_size))
+                    if x_pos > screen_width:
+                        x_pos = x_pos - screen_width - self._sprite_size
+                    self._screen.blit(bg, (x_pos, y))
+
         self._clock.tick(self._fps)
         self._frame += 0.2
+        draw_bg()
         draw_edges()
         draw_hubs()
+        draw_drones()
         pygame.display.flip()
 
     def handle_events(self) -> str:
