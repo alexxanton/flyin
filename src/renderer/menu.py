@@ -54,7 +54,8 @@ class Menu:
         items: List[MenuItem] = []
 
         if not root.is_dir():
-            return [Path(root)]
+            path = Path(root)
+            return [MenuItem(path.name, path, False, 0)]
 
         for f in root.glob("*.txt"):
             items.append(MenuItem(f.name, f, True, 0))

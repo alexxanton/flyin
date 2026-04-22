@@ -113,7 +113,7 @@ class Renderer:
                 pos: Tuple[int, int] = self._translate_pos(
                     screen_size, hub.pos
                 )
-                sprite = self._hub_sprites[hub.zone]
+                sprite = self._hub_sprites[hub.zone if hub.max_drones == 1 else f"{hub.zone}_plus"]
                 sprite = color_image(sprite, hub.color)
                 #sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, pos)
