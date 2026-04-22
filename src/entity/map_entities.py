@@ -47,3 +47,7 @@ class Hub(Entity):
     @property
     def zone(self) -> str:
         return self._zone
+
+    @property
+    def max_drones(self) -> int:
+        return self._max_drones
