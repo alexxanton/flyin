@@ -1,5 +1,4 @@
 from __future__ import annotations
-from .drone import Drone
 from .entity import Entity
 from typing import List, Tuple
 
@@ -16,6 +15,10 @@ class Edge:
     def hubs(self) -> Tuple[Hub, Hub]:
         return (self._from_hub, self._to_hub)
 
+    @property
+    def flipped(self) -> Edge:
+        return Edge(self._to_hub, self._from_hub, self._max_link_capacity)
+
 
 class Hub(Entity):
     """Represents a hub for the drones where they have to travel to."""
@@ -31,7 +34,7 @@ class Hub(Entity):
         super().__init__(x, y)
         self._name: str = name
         self._edges: List[Edge] = []
-        self._drones: List[Drone] = []
+        self._drones_landed: int = 0
         self._zone: str = zone
         self._color: str = color
         self._max_drones: int = max_drones
@@ -51,3 +54,23 @@ class Hub(Entity):
     @property
     def max_drones(self) -> int:
         return self._max_drones
+
+    @property
+    def edges(self) -> List[Edge]:
+        return self._edges
+
+    def add_edge(self, edge: Edge) -> None:
+        self._edges.append(edge)
+
+    def take_off(self) -> None:
+        if self._drones_landed <= 0:
+            raise ValueError("Can't take off if there are no drones")
+        self._drones_landed -= 1
+
+    def land_on(self) -> None:
+        if self._drones_landed >= self._max_drones:
+            raise ValueError("Max drone capacity exceeded")
+        self._drones_landed += 1
+
+    def has_capacity(self) -> bool:
+        return self._drones_landed < self._max_drones

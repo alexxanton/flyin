@@ -17,6 +17,7 @@ class Simulation:
 
         self._renderer.start(network)
         while True:
+            network.update_drones()
             self._renderer.display()
             if self._renderer.handle_events() == "quit":
                 break

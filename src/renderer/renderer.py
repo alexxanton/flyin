@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Tuple, Dict
 from src.network import DroneNetwork
 from .menu import Menu
+import sys
 
 
 class Renderer:
@@ -113,7 +114,9 @@ class Renderer:
                 pos: Tuple[int, int] = self._translate_pos(
                     screen_size, hub.pos
                 )
-                sprite = self._hub_sprites[hub.zone if hub.max_drones == 1 else f"{hub.zone}_plus"]
+                sprite = self._hub_sprites[
+                    hub.zone if hub.max_drones == 1 else f"{hub.zone}_plus"
+                ]
                 sprite = color_image(sprite, hub.color)
                 #sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, pos)
@@ -165,9 +168,13 @@ class Renderer:
     def handle_events(self) -> str:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                if len(self._menu.items) == 1:
+                    sys.exit()
                 return "quit"
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    if len(self._menu.items) == 1:
+                        sys.exit()
                     return "quit"
 
         return ""

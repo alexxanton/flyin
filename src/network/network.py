@@ -20,13 +20,22 @@ class DroneNetwork:
 
         start_x, start_y = self._start_hub.pos
         self._drones = [
-            Drone(start_x, start_y) for _ in range(self._nb_drones)
+            Drone(start_x, start_y, self._start_hub)
+            for _ in range(self._nb_drones)
         ]
 
+    def update_drones(self) -> None:
+        for drone in self._drones:
+            #print(drone._hub.edges)
+            drone.update()
+
     def _get_hub_by_id(self, name_id: str) -> Hub:
-        return next((
-            hub for hub in self._hubs if hub.name == name_id
+        hub = next((
+            h for h in self._hubs if h.name == name_id
         ), None)
+        if not hub:
+            raise ValueError(f"{name_id} not found")
+        return hub
 
     def _add_entity(self, line: Dict[str, Any]) -> None:
         """Add an entity from the parsed line."""
@@ -42,7 +51,10 @@ class DroneNetwork:
             from_hub, to_hub = [
                 self._get_hub_by_id(hub) for hub in line["params"]
             ]
-            self._edges.append(Edge(from_hub, to_hub, **line["metadata"]))
+            edge = Edge(from_hub, to_hub, **line["metadata"])
+            from_hub.add_edge(edge)
+            self._edges.append(edge)
+            #to_hub.add_edge(edge.flipped)
 
     @property
     def hubs(self) -> List[Hub]:

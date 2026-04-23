@@ -46,6 +46,10 @@ class Menu:
         self._scroll_y = 0
         self._items: List[MenuItem] = self._get_menu_items()
 
+    @property
+    def items(self) -> List[MenuItem]:
+        return self._items
+
     def _get_menu_items(self) -> List[MenuItem]:
         if len(sys.argv) < 2:
             sys.exit("Config file not provided.")
@@ -93,9 +97,6 @@ class Menu:
             return self._items[0].path
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
             if event.type == pygame.MOUSEWHEEL:
                 screen_height = self._screen.get_size()[1]
                 max_scroll = self._max_scroll
