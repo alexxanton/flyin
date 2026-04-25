@@ -1,5 +1,5 @@
 from .entity import Entity
-from .map_entities import Hub
+from .map_entities import Hub, Edge
 
 
 class Drone(Entity):
@@ -34,7 +34,16 @@ class Drone(Entity):
                 self.pos = self._hub.pos
             return
 
-        for edge in self._hub.edges:
+        def sort_priority(edge: Edge) -> int:
+            d = {
+                "priority": 0,
+                "normal": 1,
+                "restricted": 2
+            }
+            return d[edge.hubs[1].zone]
+
+        #print(sorted(self._hub.edges, key=sort_priority))
+        for edge in sorted(self._hub.edges, key=sort_priority):
             next_hub: Hub = edge.hubs[1]
 
             if next_hub.has_capacity():
