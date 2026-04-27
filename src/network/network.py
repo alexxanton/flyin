@@ -9,6 +9,7 @@ class DroneNetwork:
         self._hubs: List[Hub] = []
         self._edges: List[Edge] = []
         self._drones: List[Drone] = []
+        self._turns: int = 0
 
     def create_network(self, data: List[Dict[str, Any]]) -> None:
         """Add the entities for the drone network."""
@@ -67,3 +68,7 @@ class DroneNetwork:
     @property
     def drones(self) -> List[Drone]:
         return self._drones
+
+    @property
+    def turns(self) -> int:
+        return self._turns

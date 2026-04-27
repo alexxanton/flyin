@@ -25,6 +25,7 @@ class Renderer:
         self._bg_sprites: List[pygame.Surface] = self._load_sprites("bg")
         self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
         self._sprite_size: int = 64
+        self._font: pygame.font.Font = pygame.font.SysFont("Consolas", 20)
 
     def start(self, network: DroneNetwork) -> None:
         self._network = network
@@ -76,8 +77,10 @@ class Renderer:
             max_x = 1
         if max_y == 0:
             max_y = 1
+
+        py = 50
         x = (x - min_x) * ((width - offset) // max_x) + line_offset
-        y = (y - min_y) * ((height - offset) // max_y) + line_offset
+        y = (y - min_y) * ((height - offset - py) // max_y) + line_offset + py
         return x, y
 
     def choose_file(self) -> str:
@@ -160,6 +163,10 @@ class Renderer:
         self._clock.tick(self._fps)
         self._frame += 0.2
         draw_bg()
+        text_surf: pygame.Surface = self._font.render(
+            f"Turns: {self._network.turns}", True, "white"
+        )
+        self._screen.blit(text_surf, (10, 10))
         draw_edges()
         draw_hubs()
         draw_drones()
