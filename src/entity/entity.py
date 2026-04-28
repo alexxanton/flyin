@@ -6,8 +6,8 @@ class Entity:
 
     def __init__(self, x: int, y: int) -> None:
         """Initialize entity with its position."""
-        self._x: int = x
-        self._y: int = y
+        self._x = x
+        self._y = y
 
     @property
     def pos(self) -> Tuple[int, int]:

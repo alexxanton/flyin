@@ -5,11 +5,11 @@ from typing import List, Dict, Any
 class DroneNetwork:
     """Represents a network of drones."""
     def __init__(self) -> None:
-        self._nb_drones: int = 0
+        self._nb_drones = 0
         self._hubs: List[Hub] = []
         self._edges: List[Edge] = []
         self._drones: List[Drone] = []
-        self._turns: int = 0
+        self._turns = 0
 
     def create_network(self, data: List[Dict[str, Any]]) -> None:
         """Add the entities for the drone network."""

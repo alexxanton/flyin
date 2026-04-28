@@ -6,20 +6,20 @@ from typing import List
 
 class Node:
     def __init__(self, prev: Node) -> None:
-        self._prev: Node = prev
+        self._prev = prev
 
 
 class Drone(Entity):
     def __init__(self, x: int, y: int, hub: Hub) -> None:
         super().__init__(x, y)
-        self._hub: Hub = hub
-        self._progress: float = 0
+        self._hub = hub
+        self._progress = 0
         self._hub.land_on()
         self._og_x = x
         self._og_y = y
         self._next_x = x
         self._next_y = y
-        self._speed: int = 0
+        self._speed = 0
 
     def _fly_to_hub(self, next_hub: Hub) -> None:
         self._og_x, self._og_y = self._hub.pos
@@ -37,7 +37,7 @@ class Drone(Entity):
 
         nodes: List[Hub] = get_neighbors(self._hub.edges)
         while nodes:
-            node: Hub = nodes.pop(0)
+            node = nodes.pop(0)
 
             if node not in visited:
                 nodes += get_neighbors(node)
@@ -56,7 +56,7 @@ class Drone(Entity):
             return
 
         for edge in sorted(self._hub.edges):
-            next_hub: Hub = edge.hubs[1]
+            next_hub = edge.hubs[1]
 
             if next_hub.has_capacity():
                 self._fly_to_hub(next_hub)

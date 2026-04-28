@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple, Set, Any, Union
 
 class DroneTransformer(Transformer):
     def __init__(self) -> None:
-        self._nb_drones: int = 0
+        self._nb_drones = 0
         self._hub_names: Set[str] = set()
         self._connections: Set[Tuple[str, str]] = set()
         self._valid_zones: Set[str] = {
@@ -15,7 +15,7 @@ class DroneTransformer(Transformer):
         }
 
     def nb_drones(self, args: List[Any]) -> Dict[str, int]:
-        val: int = int(args[0])
+        val = int(args[0])
         if val < 0:
             raise ValueError("nb_drones must be a positive integer")
         self._nb_drones = val

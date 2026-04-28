@@ -32,14 +32,14 @@ drone_grammar = r"""
 
 
 def parse_data(file: str) -> List[Dict[str, Any]]:
-    data: str = ""
+    data = ""
     try:
         with open(file, "r") as f:
             data = f.read()
     except OSError as e:
         sys.exit(str(e))
 
-    parser: Lark = Lark(
+    parser = Lark(
         drone_grammar, parser="lalr", transformer=DroneTransformer()
     )
 

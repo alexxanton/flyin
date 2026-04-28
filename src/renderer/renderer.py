@@ -12,31 +12,31 @@ class Renderer:
     def __init__(self, width: int, height: int) -> None:
         pygame.init()
         pygame.display.set_caption("Fly-in Drone-out")
-        self._width: int = width
-        self._height: int = height
-        self._screen: pygame.Surface = pygame.display.set_mode(
+        self._width = width
+        self._height = height
+        self._screen = pygame.display.set_mode(
             (width, height), pygame.RESIZABLE
         )
         self._menu = Menu(self._screen)
-        self._clock: pygame.time.Clock = pygame.time.Clock()
-        self._fps: int = 60
-        self._frame: float = 0.0
+        self._clock = pygame.time.Clock()
+        self._fps = 60
+        self._frame = 0.0
 
         self._drone_sprites: List[pygame.Surface] = self._load_sprites("drone")
         self._bg_sprites: List[pygame.Surface] = self._load_sprites("bg")
         self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
-        self._sprite_size: int = 64
-        self._font: pygame.font.Font = pygame.font.SysFont("Consolas", 20)
+        self._sprite_size = 64
+        self._font = pygame.font.SysFont("Consolas", 20)
 
     def start(self, network: DroneNetwork) -> None:
         self._network = network
         xs, ys = zip(*(hub.pos for hub in network.hubs))
-        self._max_x: int = max(xs)
-        self._min_x: int = min(xs)
-        self._max_y: int = max(ys)
-        self._min_y: int = min(ys)
-        self._diff_x: int = abs(self._min_x) if self._min_x < 0 else 0
-        self._diff_y: int = abs(self._min_y) if self._min_y < 0 else 0
+        self._max_x = max(xs)
+        self._min_x = min(xs)
+        self._max_y = max(ys)
+        self._min_y = min(ys)
+        self._diff_x = abs(self._min_x) if self._min_x < 0 else 0
+        self._diff_y = abs(self._min_y) if self._min_y < 0 else 0
         self._max_x += self._diff_x
         self._max_y += self._diff_y
         if self._max_x:
@@ -45,7 +45,7 @@ class Renderer:
             self._min_y = 0
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:
-        path: Path = Path("src/renderer/sprites/hub_sprites")
+        path = Path("src/renderer/sprites/hub_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return {
             file.stem: pygame.image.load(file).convert_alpha()
@@ -53,7 +53,7 @@ class Renderer:
         }
 
     def _load_sprites(self, name: str) -> List[pygame.Surface]:
-        path: Path = Path(f"src/renderer/sprites/{name}_sprites")
+        path = Path(f"src/renderer/sprites/{name}_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return [
             pygame.image.load(file).convert_alpha()
@@ -96,7 +96,7 @@ class Renderer:
 
         def draw_edges() -> None:
             edges = self._network.edges
-            lines_surface: pygame.Surface = pygame.Surface(
+            lines_surface = pygame.Surface(
                 self._screen.get_size(), pygame.SRCALPHA
             )
             for edge in edges:
@@ -105,7 +105,7 @@ class Renderer:
                     for hub in edge.hubs
                 ]
                 try:
-                    color: pygame.Color = pygame.Color(edge.hubs[1].color)
+                    color = pygame.Color(edge.hubs[1].color)
                     color.a = 50
                 except (ValueError, TypeError):
                     color = "0x111111"
@@ -120,16 +120,14 @@ class Renderer:
 
         def draw_hubs() -> None:
             for hub in self._network.hubs:
-                pos: Tuple[int, int] = self._translate_pos(
-                    screen_size, hub.pos
-                )
+                pos = self._translate_pos(screen_size, hub.pos)
                 sprite = self._hub_sprites[
                     hub.zone if hub.max_drones == 1 else f"{hub.zone}_plus"
                 ]
                 if hub.color == "rainbow":
                     sprite = color_image(sprite, get_rainbow_color())
                 else:
-                    color: str = hub.color
+                    color = hub.color
                     if hub.color == "black":
                         color = "0x222222"
                     sprite = color_image(sprite, color)
@@ -137,28 +135,26 @@ class Renderer:
                 self._screen.blit(sprite, pos)
 
         def draw_drones() -> None:
-            sprites_len: int = len(self._drone_sprites)
+            sprites_len = len(self._drone_sprites)
             for drone in self._network.drones:
-                pos: Tuple[int, int] = self._translate_pos(
-                    screen_size, drone.pos
-                )
-                sprite: pygame.Surface = (
+                pos = self._translate_pos(screen_size, drone.pos)
+                sprite = (
                     self._drone_sprites[round(self._frame) % sprites_len]
                 )
                 x, y = pos
                 self._screen.blit(sprite, (x, y - 20))
 
         def get_rainbow_color() -> Tuple[int, int, int]:
-            frame: float = self._frame * 0.5
-            r: int = int(sin(frame) * 127 + 128)
-            g: int = int(sin(frame + 2) * 127 + 128)
-            b: int = int(sin(frame + 4) * 127 + 128)
-            color: Tuple[int, int, int] = (r, g, b)
+            frame = self._frame * 0.5
+            r = int(sin(frame) * 127 + 128)
+            g = int(sin(frame + 2) * 127 + 128)
+            b = int(sin(frame + 4) * 127 + 128)
+            color = (r, g, b)
             # print(color)
             return color
 
         def color_image(image: pygame.Surface, color: str) -> pygame.Surface:
-            temp: pygame.Surface = image.copy()
+            temp = image.copy()
             try:
                 temp.fill(color, special_flags=pygame.BLEND_RGB_MULT)
             except (ValueError, TypeError):
@@ -167,8 +163,8 @@ class Renderer:
 
         def draw_bg() -> None:
             screen_width, screen_height = screen_size
-            sprites_len: int = len(self._bg_sprites)
-            bg: pygame.Surface = (
+            sprites_len = len(self._bg_sprites)
+            bg = (
                 self._bg_sprites[round(self._frame / 10) % sprites_len]
             )
 
@@ -176,15 +172,15 @@ class Renderer:
                 for x in range(0, screen_width, self._sprite_size):
                     if (x + y) % 3:
                         continue
-                    x_pos = x + (self._frame % (screen_width + self._sprite_size))
-                    if x_pos > screen_width:
-                        x_pos = x_pos - screen_width - self._sprite_size
-                    self._screen.blit(bg, (x_pos, y))
+                    x = x + (self._frame % (screen_width + self._sprite_size))
+                    if x > screen_width:
+                        x = x - screen_width - self._sprite_size
+                    self._screen.blit(bg, (x, y))
 
         self._clock.tick(self._fps)
         self._frame += 0.2
         draw_bg()
-        text_surf: pygame.Surface = self._font.render(
+        text_surf = self._font.render(
             f"Turns: {self._network.turns}", True, "white"
         )
         self._screen.blit(text_surf, (10, 10))

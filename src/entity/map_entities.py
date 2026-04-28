@@ -19,14 +19,14 @@ class Edge:
     def flipped(self) -> Edge:
         return Edge(self._to_hub, self._from_hub, self._max_link_capacity)
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: Edge) -> bool:
         values = {
             "priority": 0,
             "normal": 1,
             "restricted": 2,
             "blocked": 3
         }
-        return values.get(self._to_hub.zone) < values.get(other._to_hub.zone)
+        return values[self._to_hub.zone] < values[other._to_hub.zone]
 
 
 class Hub(Entity):
@@ -41,12 +41,12 @@ class Hub(Entity):
         max_drones: int = 1
     ) -> None:
         super().__init__(x, y)
-        self._name: str = name
+        self._name = name
         self._edges: List[Edge] = []
-        self._drones_landed: int = 0
-        self._zone: str = zone
-        self._color: str = color
-        self._max_drones: int = max_drones
+        self._drones_landed = 0
+        self._zone = zone
+        self._color = color
+        self._max_drones = max_drones
 
     @property
     def color(self) -> str:

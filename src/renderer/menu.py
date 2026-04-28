@@ -6,11 +6,11 @@ import sys
 
 class MenuItem:
     def __init__(self, name: str, path: Path, clickable: bool, depth: int) -> None:
-        self._name: str = name
-        self._path: Path = path
-        self._clickable: bool = clickable
-        self._depth: bool = depth
-        self._rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
+        self._name = name
+        self._path = path
+        self._clickable = clickable
+        self._depth = depth
+        self._rect = pygame.Rect(0, 0, 0, 0)
 
     @property
     def name(self) -> str:
@@ -39,9 +39,9 @@ class MenuItem:
 
 class Menu:
     def __init__(self, screen: pygame.Surface) -> None:
-        self._font: pygame.font.Font = pygame.font.SysFont("Consolas", 24)
+        self._font = pygame.font.SysFont("Consolas", 24)
         self._items: List[MenuItem] = []
-        self._screen: pygame.Surface = screen
+        self._screen = screen
         self._max_scroll = 0
         self._scroll_y = 0
         self._items: List[MenuItem] = self._get_menu_items()
@@ -54,7 +54,7 @@ class Menu:
         if len(sys.argv) < 2:
             sys.exit("Config file not provided.")
 
-        root: Path = Path(sys.argv[1])
+        root = Path(sys.argv[1])
         items: List[MenuItem] = []
 
         if not root.is_dir():
@@ -89,9 +89,9 @@ class Menu:
     def display_menu(self) -> str:
         screen = self._screen
         screen.fill((30, 30, 30))
-        mouse_pos: Tuple[int, int] = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()
         menu_items = self._items
-        line_height: int = 40
+        line_height = 40
 
         if len(self._items) == 1 and not self._items[0].path.is_dir():
             return self._items[0].path
@@ -120,8 +120,8 @@ class Menu:
                     sys.exit()
 
         for i, item in enumerate(menu_items):
-            y_pos: int = (i * line_height) + self._scroll_y
-            x_pos: int = 20 + (item.depth * 20)
+            y_pos = (i * line_height) + self._scroll_y
+            x_pos = 20 + (item.depth * 20)
 
             item.rect = pygame.Rect(x_pos, y_pos, 300, line_height)
 
