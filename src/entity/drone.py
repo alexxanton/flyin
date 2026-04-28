@@ -1,5 +1,12 @@
+from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
+from typing import List
+
+
+class Node:
+    def __init__(self, prev: Node) -> None:
+        self._prev: Node = prev
 
 
 class Drone(Entity):
@@ -23,6 +30,20 @@ class Drone(Entity):
         next_hub.land_on()
         self._progress += 1
 
+    def _find_path(self) -> List[Hub]:
+        def get_neighbors(hub: Hub) -> List[Hub]:
+            edges: List[Edge] = sorted(hub.edges)
+            nodes = [edge.hubs[1] for edge in edges]
+
+        nodes: List[Hub] = get_neighbors(self._hub.edges)
+        while nodes:
+            node: Hub = nodes.pop(0)
+
+            if node not in visited:
+                nodes += get_neighbors(node)
+
+            visited.append(node)
+
     def update(self) -> None:
         if self._progress > 0:
             self._progress += self._speed * 0.7
@@ -34,18 +55,10 @@ class Drone(Entity):
                 self.pos = self._hub.pos
             return
 
-        def sort_priority(edge: Edge) -> int:
-            d = {
-                "priority": 0,
-                "normal": 1,
-                "restricted": 2
-            }
-            return d[edge.hubs[1].zone]
-
-        #print(sorted(self._hub.edges, key=sort_priority))
-        for edge in sorted(self._hub.edges, key=sort_priority):
+        for edge in sorted(self._hub.edges):
             next_hub: Hub = edge.hubs[1]
 
             if next_hub.has_capacity():
                 self._fly_to_hub(next_hub)
+                #print(f"D{1}-next_hub.name", end=" ")
                 break

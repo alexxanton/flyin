@@ -19,6 +19,15 @@ class Edge:
     def flipped(self) -> Edge:
         return Edge(self._to_hub, self._from_hub, self._max_link_capacity)
 
+    def __lt__(self, other) -> bool:
+        values = {
+            "priority": 0,
+            "normal": 1,
+            "restricted": 2,
+            "blocked": 3
+        }
+        return values.get(self._to_hub.zone) < values.get(other._to_hub.zone)
+
 
 class Hub(Entity):
     """Represents a hub for the drones where they have to travel to."""
