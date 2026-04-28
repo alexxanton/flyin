@@ -4,6 +4,7 @@ from typing import List, Tuple, Dict
 from src.network import DroneNetwork
 from .menu import Menu
 import sys
+from math import sin
 
 
 class Renderer:
@@ -108,6 +109,11 @@ class Renderer:
                     color.a = 50
                 except (ValueError, TypeError):
                     color = "0x111111"
+
+                if edge.hubs[1].color == "rainbow":
+                    color = pygame.Color(get_rainbow_color())
+                    color.a = 50
+
                 pygame.draw.line(lines_surface, color, start, end, 5)
 
             self._screen.blit(lines_surface, (0, 0))
@@ -120,7 +126,13 @@ class Renderer:
                 sprite = self._hub_sprites[
                     hub.zone if hub.max_drones == 1 else f"{hub.zone}_plus"
                 ]
-                sprite = color_image(sprite, hub.color)
+                if hub.color == "rainbow":
+                    sprite = color_image(sprite, get_rainbow_color())
+                else:
+                    color: str = hub.color
+                    if hub.color == "black":
+                        color = "0x222222"
+                    sprite = color_image(sprite, color)
                 #sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, pos)
 
@@ -135,6 +147,15 @@ class Renderer:
                 )
                 x, y = pos
                 self._screen.blit(sprite, (x, y - 20))
+
+        def get_rainbow_color() -> Tuple[int, int, int]:
+            frame: float = self._frame * 0.5
+            r: int = int(sin(frame) * 127 + 128)
+            g: int = int(sin(frame + 2) * 127 + 128)
+            b: int = int(sin(frame + 4) * 127 + 128)
+            color: Tuple[int, int, int] = (r, g, b)
+            # print(color)
+            return color
 
         def color_image(image: pygame.Surface, color: str) -> pygame.Surface:
             temp: pygame.Surface = image.copy()
