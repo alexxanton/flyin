@@ -9,13 +9,16 @@ from math import sin
 
 class Renderer:
     """Renders the drone network using pygame"""
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self) -> None:
         pygame.init()
         pygame.display.set_caption("Fly-in Drone-out")
-        self._width = width
-        self._height = height
+        screen_size = pygame.display.get_desktop_sizes()[0]
+
+        big_screen = screen_size[0] > 2000
+        self._width = 800 * (big_screen + 1)
+        self._height = 600 * (big_screen + 1)
         self._screen = pygame.display.set_mode(
-            (width, height), pygame.RESIZABLE
+            (self._width, self._height), pygame.RESIZABLE
         )
         self._menu = Menu(self._screen)
         self._clock = pygame.time.Clock()
@@ -25,8 +28,9 @@ class Renderer:
         self._drone_sprites: List[pygame.Surface] = self._load_sprites("drone")
         self._bg_sprites: List[pygame.Surface] = self._load_sprites("bg")
         self._hub_sprites: Dict[str, pygame.Surface] = self._load_hub_sprites()
-        self._sprite_size = 64
-        self._font = pygame.font.SysFont("Consolas", 20)
+
+        self._sprite_size = (128 if big_screen else 64)
+        self._font = pygame.font.SysFont("Consolas", 35 if big_screen else 20)
 
     def start(self, network: DroneNetwork) -> None:
         self._network = network
@@ -131,7 +135,7 @@ class Renderer:
                     if hub.color == "black":
                         color = "0x222222"
                     sprite = color_image(sprite, color)
-                #sprite = pygame.transform.scale(sprite, (128, 128))
+                sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, pos)
 
         def draw_drones() -> None:
@@ -142,6 +146,7 @@ class Renderer:
                     self._drone_sprites[round(self._frame) % sprites_len]
                 )
                 x, y = pos
+                sprite = pygame.transform.scale(sprite, (128, 128))
                 self._screen.blit(sprite, (x, y - 20))
 
         def get_rainbow_color() -> Tuple[int, int, int]:
@@ -150,7 +155,6 @@ class Renderer:
             g = int(sin(frame + 2) * 127 + 128)
             b = int(sin(frame + 4) * 127 + 128)
             color = (r, g, b)
-            # print(color)
             return color
 
         def color_image(image: pygame.Surface, color: str) -> pygame.Surface:

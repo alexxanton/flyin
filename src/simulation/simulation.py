@@ -7,7 +7,7 @@ import sys
 
 class Simulation:
     def __init__(self) -> None:
-        self._renderer = Renderer(800, 600)
+        self._renderer = Renderer()
 
     def _run_simulation(self) -> None:
         file = self._renderer.choose_file()
