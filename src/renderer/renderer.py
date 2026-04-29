@@ -185,7 +185,7 @@ class Renderer:
         self._frame += 0.2
         draw_bg()
         text_surf = self._font.render(
-            f"Turns: {self._network.turns}", True, "white"
+            f"Turns: {self._network.turn}", True, "white"
         )
         self._screen.blit(text_surf, (10, 10))
         draw_edges()
@@ -196,9 +196,7 @@ class Renderer:
     def handle_events(self) -> str:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if len(self._menu.items) == 1:
-                    sys.exit()
-                return "quit"
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     if len(self._menu.items) == 1:

@@ -2,6 +2,10 @@ from src.entity import Hub, Edge, Drone
 from typing import List, Dict, Any
 
 
+class Turn:
+    turn = 0
+
+
 class DroneNetwork:
     """Represents a network of drones."""
     def __init__(self) -> None:
@@ -9,7 +13,7 @@ class DroneNetwork:
         self._hubs: List[Hub] = []
         self._edges: List[Edge] = []
         self._drones: List[Drone] = []
-        self._turns = 0
+        self._turn = Turn()
 
     def create_network(self, data: List[Dict[str, Any]]) -> None:
         """Add the entities for the drone network."""
@@ -21,11 +25,13 @@ class DroneNetwork:
 
         start_x, start_y = self._start_hub.pos
         self._drones = [
-            Drone(start_x, start_y, self._start_hub)
+            Drone(start_x, start_y, self._start_hub, self._turn)
             for _ in range(self._nb_drones)
         ]
 
     def update_drones(self) -> None:
+        if all([drone._progress == 0 for drone in self._drones if drone._speed == 2]):
+            self._turn.turn += 1
         for drone in self._drones:
             #print(drone._hub.edges)
             drone.update()
@@ -70,5 +76,5 @@ class DroneNetwork:
         return self._drones
 
     @property
-    def turns(self) -> int:
-        return self._turns
+    def turn(self) -> int:
+        return self._turn.turn

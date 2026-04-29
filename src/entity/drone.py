@@ -2,6 +2,10 @@ from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
 from typing import List
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.network import Turn
 
 
 class Node:
@@ -10,8 +14,12 @@ class Node:
 
 
 class Drone(Entity):
-    def __init__(self, x: int, y: int, hub: Hub) -> None:
+    next_id = 1
+
+    def __init__(self, x: int, y: int, hub: Hub, turn: Turn) -> None:
         super().__init__(x, y)
+        self._id = Drone.next_id
+        Drone.next_id += 1
         self._hub = hub
         self._progress = 0
         self._hub.land_on()
@@ -20,6 +28,8 @@ class Drone(Entity):
         self._next_x = x
         self._next_y = y
         self._speed = 0
+        self._turn = turn
+        self._last_turn = 0
 
     def _fly_to_hub(self, next_hub: Hub) -> None:
         self._og_x, self._og_y = self._hub.pos
@@ -58,7 +68,8 @@ class Drone(Entity):
         for edge in sorted(self._hub.edges):
             next_hub = edge.hubs[1]
 
-            if next_hub.has_capacity():
+            if next_hub.has_capacity() and self._last_turn != self._turn.turn:
+                self._last_turn = self._turn.turn
                 self._fly_to_hub(next_hub)
                 #print(f"D{1}-next_hub.name", end=" ")
                 break
