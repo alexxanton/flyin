@@ -2,10 +2,6 @@ from src.entity import Hub, Edge, Drone
 from typing import List, Dict, Any
 
 
-class Turn:
-    turn = 0
-
-
 class DroneNetwork:
     """Represents a network of drones."""
     def __init__(self) -> None:
@@ -13,7 +9,7 @@ class DroneNetwork:
         self._hubs: List[Hub] = []
         self._edges: List[Edge] = []
         self._drones: List[Drone] = []
-        self._turn = Turn()
+        self._turn = 0
 
     def create_network(self, data: List[Dict[str, Any]]) -> None:
         """Add the entities for the drone network."""
@@ -25,15 +21,41 @@ class DroneNetwork:
 
         start_x, start_y = self._start_hub.pos
         self._drones = [
-            Drone(start_x, start_y, self._start_hub, self._turn)
+            Drone(start_x, start_y, self._start_hub)
             for _ in range(self._nb_drones)
         ]
 
-    def update_drones(self) -> None:
-        if all([drone._progress == 0 for drone in self._drones if drone._speed == 2]):
-            self._turn.turn += 1
+    def drones_landed(self) -> bool:
+        if not self._end_hub.has_capacity():
+            return False
+
+        return (
+            all([drone._progress == 0 for drone in self._drones ])
+            #if drone._speed == 2
+        )
+
+    def find_paths(self) -> None:
+        self._turn += 1
         for drone in self._drones:
-            #print(drone._hub.edges)
+            drone.next_move()
+
+        def inactive_drones() -> List[Drone]:
+            return [drone for drone in self._drones if drone._progress == 0]
+
+        drones = inactive_drones()
+        qty = len(drones)
+        prev_qty = qty + 1
+
+        while drones and qty < prev_qty:
+            drones = inactive_drones()
+            qty = len(drones)
+            for drone in drones:
+                drone.next_move()
+            prev_qty = qty
+        print()
+
+    def update_drones(self) -> None:
+        for drone in self._drones:
             drone.update()
 
     def _get_hub_by_id(self, name_id: str) -> Hub:
@@ -77,4 +99,4 @@ class DroneNetwork:
 
     @property
     def turn(self) -> int:
-        return self._turn.turn
+        return self._turn

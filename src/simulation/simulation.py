@@ -1,5 +1,5 @@
 from src.parser import parse_data
-from src.entity import Hub
+from src.entity import Hub, Drone
 from src.network import DroneNetwork
 from src.renderer import Renderer
 import sys
@@ -17,11 +17,15 @@ class Simulation:
 
         self._renderer.start(network)
         while True:
-            network.update_drones()
+            if not network.drones_landed():
+                network.update_drones()
+            else:
+                network.find_paths()
             self._renderer.display()
             if self._renderer.handle_events() == "quit":
                 break
 
     def start(self) -> None:
         while True:
+            Drone.next_id = 1
             self._run_simulation()

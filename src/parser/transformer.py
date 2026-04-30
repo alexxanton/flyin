@@ -72,7 +72,8 @@ class DroneTransformer(Transformer):
 
         connection = (from_hub, to_hub)
         if connection in self._connections:
-            raise ValueError()
+            raise ValueError(f"Repeated connection {connection}")
+        self._connections.add(connection)
 
         return {
             "type": "connection",

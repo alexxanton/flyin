@@ -69,12 +69,12 @@ class Menu:
                 return 0
 
             order = {
-                "challenger": 3,
-                "hard": 2,
+                "easy": 0,
                 "medium": 1,
-                "easy": 0
+                "hard": 2,
+                "challenger": 3
             }
-            return order[p.name]
+            return order.get(p.name, len(order))
 
         for folder in sorted(root.iterdir(), key=sort_order):
             if folder.is_dir():

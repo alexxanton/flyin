@@ -47,6 +47,7 @@ class Hub(Entity):
         self._zone = zone
         self._color = color
         self._max_drones = max_drones
+        self._reserved = False
 
     @property
     def color(self) -> str:
@@ -67,6 +68,14 @@ class Hub(Entity):
     @property
     def edges(self) -> List[Edge]:
         return self._edges
+
+    @property
+    def reserved(self) -> bool:
+        return self._reserved
+
+    @reserved.setter
+    def reserved(self, b: bool) -> None:
+        self._reserved = b
 
     def add_edge(self, edge: Edge) -> None:
         self._edges.append(edge)
