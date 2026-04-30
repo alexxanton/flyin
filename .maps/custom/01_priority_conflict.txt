@@ -1,0 +1,16 @@
+nb_drones: 3
+start_hub: start 0 0 [color=rainbow]
+end_hub: end 3 0 [color=rainbow]
+
+hub: conflict1 2 1 [color=purple]
+hub: conflict2 2 -1 [color=purple]
+hub: conflict3 1 0 [color=purple]
+hub: troublemaker 2 0 [zone=restricted color=darkred]
+
+connection: start-conflict1
+connection: start-conflict2
+connection: start-conflict3
+connection: conflict1-troublemaker
+connection: conflict2-troublemaker
+connection: conflict3-troublemaker
+connection: troublemaker-end

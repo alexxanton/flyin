@@ -160,6 +160,7 @@ connection: priority_trap1-priority_trap2
 connection: priority_trap3-priority_trap4
 
 # Layer 4 connections (convergence hell)
+#here
 connection: false_hope3-conv_restricted1
 connection: false_hope3-conv_restricted4
 connection: false_hope3-conv_restricted7
