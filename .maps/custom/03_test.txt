@@ -1,0 +1,61 @@
+# Map: The Convergent Paths
+# - Short blocked route through the center
+# - Long route that splits into two: priority-heavy and restricted
+# - Both branches reunite before reaching the goal
+
+nb_drones: 8
+
+# --- BASES ---
+start_hub: Starting 150 600 [color=rainbow]
+
+# MID ROUTE
+# Direct but blocked - cannot be used
+hub: mid1 400 600 [zone=normal color=green max_drones=1]
+hub: mid2 800 600 [zone=blocked color=yellow]
+hub: mid3 1300 600 [zone=priority color=green]
+# LOW ROUTE
+# Higher speed, more priority zones, same number of hops
+hub: low1 400 400 [zone=priority color=green max_drones=4]
+hub: low2 700 350 [zone=restricted color=yellow max_drones=4]
+hub: low3 1000 350 [zone=priority color=green max_drones=4]
+hub: low4 1300 400 [zone=priority color=green max_drones=4]
+
+# UPPER ROUTE
+# Slower zone with restricted capacity, same number of hops
+hub: upper1 470 800 [zone=restricted color=yellow max_drones=2]
+hub: upper2 700 850 [zone=priority color=green max_drones=2]
+hub: upper3 1000 850 [zone=restricted color=yellow max_drones=2]
+hub: upper4 1300 800 [zone=restricted color=yellow max_drones=2]
+
+# --- CONVERGENCE HUB ---
+# Where both branches meet before the goal
+end_hub: End_Hub 1500 600 [zone=normal color=rainbow]
+
+# ================= CONNECTIONS =================
+
+# --- Initial Split: Short Blocked vs Long Viable ---
+connection: Starting-mid1
+connection: Starting-low1
+connection: Starting-upper1
+
+# MID ROUTE
+connection: mid1-mid2
+connection: mid2-mid3
+connection: mid3-End_Hub
+
+# LOWER ROUTE
+connection: low1-low2 [max_link_capacity=3]
+connection: low2-low3 [max_link_capacity=3]
+connection: low3-low4 [max_link_capacity=3]
+connection: low4-End_Hub
+
+# UPPER ROUTE
+connection: upper1-upper2
+connection: upper2-upper3
+connection: upper3-upper4
+connection: upper4-End_Hub
+
+connection: upper3-mid3
+connection: mid2-low1
+connection: mid1-upper1
+connection: mid2-low4

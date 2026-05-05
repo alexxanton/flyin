@@ -1,7 +1,9 @@
 from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
-from typing import List
+from typing import List, Set
+from collections import deque
+import sys
 
 
 class Node:
@@ -16,6 +18,10 @@ class Node:
             path.append(node._hub)
             node = node._prev
         return path[::-1]
+
+    @property
+    def hub(self) -> Hub:
+        return self._hub
 
 
 class Drone(Entity):
@@ -67,24 +73,32 @@ class Drone(Entity):
         print(f"D{self._id}-{next_hub.name}", end=" ")
 
     def _find_path(self) -> List[Node]:
-        def get_neighbors(node: Node) -> List[Node]:
-            edges: List[Edge] = sorted(node._hub.edges)
-            nodes = [Node(edge.hubs[1], node) for edge in edges]
-            return nodes
+        def get_neighbors(node: Node):
+            edges = sorted(node._hub.edges)
+            return [Node(edge.hubs[1], node) for edge in edges]
 
-        visited = []
+        visited: Set[Hub] = set()
         start = Node(self._hub, None)
-        nodes: List[Node] = get_neighbors(start)
-        while nodes:
-            node = nodes.pop(0)
 
-            if node not in visited:
-                nodes += get_neighbors(node)
+        queue = deque(get_neighbors(start))
 
-            if node._hub.hub_type == "end_hub":
+        if start.hub.hub_type == "end_hub":
+            return []
+
+        while queue:
+            node = queue.popleft()
+
+            if node.hub in visited:
+                continue
+
+            if node.hub.hub_type == "end_hub":
                 return node.get_path()
 
-            visited.append(node)
+            visited.add(node.hub)
+            queue.extend(get_neighbors(node))
+
+        if node.hub.hub_type != "end_hub":
+            sys.exit("Unsolvable map!")
 
         return []
 

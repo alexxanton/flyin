@@ -26,7 +26,8 @@ class Edge:
             "restricted": 2,
             "blocked": 3
         }
-        return values[self._to_hub.zone] < values[other._to_hub.zone]
+        value = values[self._to_hub.zone] - self._to_hub.has_capacity()
+        return value < values[other._to_hub.zone]
 
 
 class Hub(Entity):

@@ -83,7 +83,7 @@ class DroneNetwork:
             edge = Edge(from_hub, to_hub, **line["metadata"])
             from_hub.add_edge(edge)
             self._edges.append(edge)
-            #to_hub.add_edge(edge.flipped)
+            to_hub.add_edge(edge.flipped)
 
     @property
     def hubs(self) -> List[Hub]:
