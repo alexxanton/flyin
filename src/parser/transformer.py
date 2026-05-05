@@ -26,7 +26,7 @@ class DroneTransformer(Transformer):
         if name in self._hub_names:
             raise ValueError(f"Duplicate zone name: {name}")
         self._hub_names.add(name)
-        return name, x, y
+        return name, x, -y
 
     def hub_line(self, args: List[Any]) -> Dict[str, Any]:
         hub_type = str(args[0])

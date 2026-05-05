@@ -2,18 +2,27 @@ from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
 from typing import List
-from typing import TYPE_CHECKING
 
 
 class Node:
-    def __init__(self, prev: Node) -> None:
+    def __init__(self, hub: Hub, prev: Node) -> None:
+        self._hub = hub
         self._prev = prev
+
+    def get_path(self) -> List[Hub]:
+        path: List[Hub] = [self._hub]
+        node = self._prev
+        while node:
+            path.append(node._hub)
+            node = node._prev
+        return path[::-1]
 
 
 class Drone(Entity):
     next_id = 1
 
     def __init__(self, x: int, y: int, hub: Hub) -> None:
+        """Initialize a drone entity."""
         super().__init__(x, y)
         self._id = Drone.next_id
         Drone.next_id += 1
@@ -28,7 +37,9 @@ class Drone(Entity):
         self._reserved = None
 
     def _create_temp_hub(self, next_hub: Hub) -> Hub:
-        self._reserved = next_hub
+        """
+        Create a temporary hub to store the position of the middle between hubs.
+        """
         x, y = self._hub.pos
         nx, ny = next_hub.pos
         half_x = (nx - x) * 50 / 100 + x
@@ -40,10 +51,10 @@ class Drone(Entity):
 
     def _fly_to_hub(self, next_hub: Hub) -> None:
         self._og_x, self._og_y = self._hub.pos
-        #self._speed = 1 if next_hub.zone == "restricted" else 2
         if next_hub.zone == "restricted":
             if not self._reserved:
                 next_hub.reserved = True
+                self._reserved = next_hub
                 next_hub = self._create_temp_hub(next_hub)
             else:
                 self._reserved = None
@@ -55,30 +66,51 @@ class Drone(Entity):
         self._progress += 1
         print(f"D{self._id}-{next_hub.name}", end=" ")
 
-    def _find_path(self) -> List[Hub]:
-        def get_neighbors(hub: Hub) -> List[Hub]:
-            edges: List[Edge] = sorted(hub.edges)
-            nodes = [edge.hubs[1] for edge in edges]
+    def _find_path(self) -> List[Node]:
+        def get_neighbors(node: Node) -> List[Node]:
+            edges: List[Edge] = sorted(node._hub.edges)
+            nodes = [Node(edge.hubs[1], node) for edge in edges]
+            return nodes
 
-        nodes: List[Hub] = get_neighbors(self._hub.edges)
+        visited = []
+        start = Node(self._hub, None)
+        nodes: List[Node] = get_neighbors(start)
         while nodes:
             node = nodes.pop(0)
 
             if node not in visited:
                 nodes += get_neighbors(node)
 
+            if node._hub.hub_type == "end_hub":
+                return node.get_path()
+
             visited.append(node)
 
-    def next_move(self) -> None:
-        for edge in sorted(self._hub.edges):
-            next_hub = edge.hubs[1]
+        return []
 
-            if next_hub.has_capacity() or next_hub.zone == "restricted":
-                if next_hub.zone == "restricted" and next_hub.reserved:
-                    if not self._reserved == next_hub:
-                        continue
-                self._fly_to_hub(next_hub)
-                break
+    def next_move(self) -> None:
+        hubs = self._find_path()
+        #print(self._id, [h.name for h in hubs])
+
+        if len(hubs) < 1:
+            return
+
+        next_hub = hubs[1]
+
+        if not next_hub.has_capacity():
+            return
+
+        if next_hub.zone == "restricted":
+            if next_hub.reserved:
+                if self._reserved == next_hub:
+                    self._fly_to_hub(next_hub)
+                    return
+
+        try:
+            self._fly_to_hub(next_hub)
+        except ValueError as e:
+            print(e)
+
 
     def update(self) -> None:
         if self._progress > 0:

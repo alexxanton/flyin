@@ -36,6 +36,7 @@ class Hub(Entity):
         name: str,
         x: int,
         y: int,
+        hub_type: str = "normal",
         zone: str = "normal",
         color: str = "none",
         max_drones: int = 1
@@ -48,6 +49,7 @@ class Hub(Entity):
         self._color = color
         self._max_drones = max_drones
         self._reserved = False
+        self._hub_type = hub_type
 
     @property
     def color(self) -> str:
@@ -70,6 +72,10 @@ class Hub(Entity):
         return self._edges
 
     @property
+    def hub_type(self) -> str:
+        return self._hub_type
+
+    @property
     def reserved(self) -> bool:
         return self._reserved
 
@@ -87,7 +93,7 @@ class Hub(Entity):
 
     def land_on(self) -> None:
         if self._drones_landed >= self._max_drones:
-            raise ValueError("Max drone capacity exceeded")
+            raise ValueError(f"{self._name}: Max drone capacity exceeded")
         self._drones_landed += 1
 
     def has_capacity(self) -> bool:
