@@ -40,7 +40,7 @@ class Drone(Entity):
         self._next_x = x
         self._next_y = y
         self._speed = 2
-        self._reserved = None
+        self._reserved_hub = None
 
     def _create_temp_hub(self, next_hub: Hub) -> Hub:
         """
@@ -56,19 +56,23 @@ class Drone(Entity):
         return temp_hub
 
     def _fly_to_hub(self, next_hub: Hub) -> None:
+        already_landed = False
         self._og_x, self._og_y = self._hub.pos
         if next_hub.zone == "restricted":
-            if not self._reserved:
-                next_hub.reserved = True
-                self._reserved = next_hub
+            if not self._reserved_hub and next_hub.has_capacity():
+                next_hub.land_on()
+                next_hub.is_reserved = True
+                self._reserved_hub = next_hub
                 next_hub = self._create_temp_hub(next_hub)
             else:
-                self._reserved = None
-                next_hub.reserved = False
+                self._reserved_hub = None
+                next_hub.is_reserved = False
+                already_landed = True
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
         self._hub = next_hub
-        next_hub.land_on()
+        if not already_landed:
+            next_hub.land_on()
         self._progress += 1
         print(f"D{self._id}-{next_hub.name}", end=" ")
 
@@ -111,12 +115,12 @@ class Drone(Entity):
 
         next_hub = hubs[1]
 
-        if not next_hub.has_capacity():
+        if not next_hub.has_capacity() and not self._reserved_hub:
             return
 
         if next_hub.zone == "restricted":
-            if next_hub.reserved:
-                if self._reserved == next_hub:
+            if next_hub.is_reserved:
+                if self._reserved_hub == next_hub:
                     self._fly_to_hub(next_hub)
                     return
 
