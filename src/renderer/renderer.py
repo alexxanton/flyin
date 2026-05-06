@@ -78,14 +78,21 @@ class Renderer:
         x += self._diff_x
         y += self._diff_y
         line_offset = self._sprite_size // 2 if line else 0
-        if max_x == 0:
-            max_x = 1
-        if max_y == 0:
-            max_y = 1
+
+        range_x = max_x - min_x
+        range_y = max_y - min_y
+
+        if range_x == 0:
+            range_x = 1
+        if range_y == 0:
+            range_y = 1
 
         py = 50
-        x = (x - min_x) * ((width - offset) // max_x) + line_offset
-        y = (y - min_y) * ((height - offset - py) // max_y) + line_offset + py
+        scale_x = (width - offset) / range_x
+        scale_y = (height - offset - py) / range_y
+
+        x = int((x - min_x) * scale_x + line_offset)
+        y = int((y - min_y) * scale_y + line_offset + py)
         return x, y
 
     def choose_file(self) -> str:
