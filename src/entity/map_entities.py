@@ -49,7 +49,7 @@ class Hub(Entity):
         self._zone = zone
         self._color = color
         self._max_drones = max_drones
-        self._reserved = False
+        self._is_reserved = False
         self._hub_type = hub_type
 
     @property
@@ -77,12 +77,12 @@ class Hub(Entity):
         return self._hub_type
 
     @property
-    def reserved(self) -> bool:
-        return self._reserved
+    def is_reserved(self) -> bool:
+        return self._is_reserved
 
-    @reserved.setter
-    def reserved(self, b: bool) -> None:
-        self._reserved = b
+    @is_reserved.setter
+    def is_reserved(self, b: bool) -> None:
+        self._is_reserved = b
 
     def add_edge(self, edge: Edge) -> None:
         self._edges.append(edge)
