@@ -43,9 +43,9 @@ class Renderer:
         self._diff_y = abs(self._min_y) if self._min_y < 0 else 0
         self._max_x += self._diff_x
         self._max_y += self._diff_y
-        if self._max_x:
+        if self._diff_x:
             self._min_x = 0
-        if self._max_y:
+        if self._diff_y:
             self._min_y = 0
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:

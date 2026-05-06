@@ -88,7 +88,7 @@ class Drone(Entity):
         while queue:
             node = queue.popleft()
 
-            if node.hub in visited:
+            if node.hub in visited or node.hub.zone == "blocked":
                 continue
 
             if node.hub.hub_type == "end_hub":
