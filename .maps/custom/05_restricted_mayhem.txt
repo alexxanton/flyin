@@ -1,5 +1,0 @@
-nb_drones: 10
-start_hub: start 0 0
-end_hub: end 100 0
-
-connection: end-start
