@@ -6,6 +6,7 @@ class DroneTransformer(Transformer):
     def __init__(self) -> None:
         self._nb_drones = 0
         self._hub_names: Set[str] = set()
+        self._hub_positions: Set[int] = set()
         self._connections: Set[Tuple[str, str]] = set()
         self._valid_zones: Set[str] = {
             "normal", "blocked", "restricted", "priority"
@@ -67,8 +68,9 @@ class DroneTransformer(Transformer):
 
     def connection_line(self, args: List[Any]) -> Dict[str, Any]:
         from_hub, to_hub = str(args[0]), str(args[1])
-        if from_hub not in self._hub_names or to_hub not in self._hub_names:
-            raise ValueError()
+        for hub in [from_hub, to_hub]:
+            if not hub in self._hub_names:
+                raise ValueError(f"Unkown hub name: {hub}")
 
         connection = (from_hub, to_hub)
         if connection in self._connections:
