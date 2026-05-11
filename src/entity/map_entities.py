@@ -51,6 +51,7 @@ class Hub(Entity):
         self._max_drones = max_drones
         self._is_reserved = False
         self._hub_type = hub_type
+        self.available = False
 
     @property
     def color(self) -> str:

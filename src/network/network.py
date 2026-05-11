@@ -1,5 +1,6 @@
 from src.entity import Hub, Edge, Drone
 from typing import List, Dict, Any
+from copy import copy
 
 
 class DroneNetwork:
@@ -10,6 +11,7 @@ class DroneNetwork:
         self._edges: List[Edge] = []
         self._drones: List[Drone] = []
         self._turn = 0
+        self._copy = False
 
     def create_network(self, data: List[Dict[str, Any]]) -> None:
         """Add the entities for the drone network."""
@@ -34,10 +36,21 @@ class DroneNetwork:
             #if drone._speed == 2
         )
 
+
     def find_paths(self) -> None:
+        def _future(hub) -> bool:
+            cpy = copy(self)
+            cpy._copy = True
+            for x in range(2):
+                cpy.find_paths()
+
+            print(cpy._hubs)
+            next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
+            return next_hub.has_capacity()
+
         self._turn += 1
         for drone in self._drones:
-            drone.next_move()
+            drone.next_move(_future if not self._copy else None)
 
         def inactive_drones() -> List[Drone]:
             return [drone for drone in self._drones if drone._progress == 0]
@@ -50,7 +63,7 @@ class DroneNetwork:
             drones = inactive_drones()
             qty = len(drones)
             for drone in drones:
-                drone.next_move()
+                drone.next_move(_future if not self._copy else None)
             prev_qty = qty
         print()
 

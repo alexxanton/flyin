@@ -34,7 +34,7 @@ test: install
 
 debug: install
 	@echo "Running in debug mode..."
-	$(VENV_BIN)/python -m pdb $(MAIN) config.txt
+	$(VENV_BIN)/python -m pdb $(MAIN) .maps
 
 clean:
 	@echo "Cleaning cache and temporary files..."

@@ -1,14 +1,13 @@
-nb_drones: 10
-start_hub: start 0 0
-hub: middle 1 0
-hub: top 1 1 [max_drones=8]
-hub: pre_botlnck 2 1
-hub: bottle_neck 3 1 [zone=restricted]
-end_hub: end 4 0
+nb_drones: 100
+start_hub: start 1 0
+hub: middle 3 0 [color=orange max_drones=8]
+hub: bottle_neck 2 0 [zone=restricted ]
+end_hub: end 5 0
+hub: bad_guy 4 0 [color=red]
+hub: skull1 3 1 [zone=blocked color=rainbow]
+hub: skull2 3 -1 [zone=blocked color=rainbow]
 
-connection: start-middle
-connection: start-top
-connection: top-pre_botlnck
-connection: middle-pre_botlnck
-connection: pre_botlnck-bottle_neck
-connection: bottle_neck-end
+connection: bottle_neck-middle
+connection: middle-bad_guy
+connection: bad_guy-end
+connection: start-bottle_neck

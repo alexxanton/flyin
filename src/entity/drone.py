@@ -55,7 +55,7 @@ class Drone(Entity):
         temp_hub.add_edge(edge)
         return temp_hub
 
-    def _fly_to_hub(self, next_hub: Hub) -> None:
+    def _fly_to_hub(self, next_hub: Hub, future = None) -> None:
         already_landed = False
         self._og_x, self._og_y = self._hub.pos
         if next_hub.zone == "restricted":
@@ -76,7 +76,7 @@ class Drone(Entity):
         self._progress += 1
         print(f"D{self._id}-{next_hub.name}", end=" ")
 
-    def _find_path(self) -> List[Node]:
+    def _find_path(self) -> List[Hub]:
         def get_neighbors(node: Node):
             edges = sorted(node._hub.edges)
             return [Node(edge.hubs[1], node) for edge in edges]
@@ -106,7 +106,7 @@ class Drone(Entity):
 
         return []
 
-    def next_move(self) -> None:
+    def next_move(self, future) -> None:
         hubs = self._find_path()
         #print(self._id, [h.name for h in hubs])
 
@@ -121,7 +121,7 @@ class Drone(Entity):
         if next_hub.zone == "restricted":
             if next_hub.is_reserved:
                 if self._reserved_hub == next_hub:
-                    self._fly_to_hub(next_hub)
+                    self._fly_to_hub(next_hub, future)
                     return
 
         try:
@@ -129,8 +129,8 @@ class Drone(Entity):
         except ValueError as e:
             print(e)
 
-
     def update(self) -> None:
+        """Update the drone position."""
         if self._progress > 0:
             self._progress += self._speed * 0.7
             x = (self._next_x - self._og_x) * self._progress / 100 + self._og_x
