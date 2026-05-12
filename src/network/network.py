@@ -38,22 +38,20 @@ class DroneNetwork:
 
 
     def find_paths(self) -> None:
+        cpy = deepcopy(self)
+        cpy._copy = True
         def _future(hub) -> bool:
-            cpy = deepcopy(self)
-            cpy._copy = True
+            next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
             for x in range(2):
+                print(x)
                 cpy.find_paths()
                 while not cpy.drones_landed():
                     cpy.update_drones()
 
-            next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
             print(next_hub.name, next_hub._drones_landed)
             return next_hub.has_capacity()
 
         self._turn += 1
-        for drone in self._drones:
-            drone.next_move(_future if not self._copy else None)
-
         def inactive_drones() -> List[Drone]:
             return [drone for drone in self._drones if drone._progress == 0]
 
