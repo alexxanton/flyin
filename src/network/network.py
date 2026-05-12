@@ -1,6 +1,6 @@
 from src.entity import Hub, Edge, Drone
 from typing import List, Dict, Any
-from copy import copy
+from copy import deepcopy
 
 
 class DroneNetwork:
@@ -39,13 +39,15 @@ class DroneNetwork:
 
     def find_paths(self) -> None:
         def _future(hub) -> bool:
-            cpy = copy(self)
+            cpy = deepcopy(self)
             cpy._copy = True
             for x in range(2):
                 cpy.find_paths()
+                while not cpy.drones_landed():
+                    cpy.update_drones()
 
-            print(cpy._hubs)
             next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
+            print(next_hub.name, next_hub._drones_landed)
             return next_hub.has_capacity()
 
         self._turn += 1
