@@ -27,20 +27,19 @@ class DroneNetwork:
             for _ in range(self._nb_drones)
         ]
 
+    def end_reached(self) -> bool:
+        """Return whether all drones have reached the end or not."""
+        return not self._end_hub.has_capacity()
+
     def drones_landed(self) -> bool:
-        if not self._end_hub.has_capacity():
-            return False
-
-        return (
-            all([drone._progress == 0 for drone in self._drones ])
-            #if drone._speed == 2
-        )
-
+        """Checks if all the drones have reached their objective."""
+        return all([drone.progress == 0 for drone in self._drones])
 
     def find_paths(self) -> None:
-        cpy = deepcopy(self)
-        cpy._copy = True
+        og_cpy = deepcopy(self)
+        og_cpy._copy = True
         def _future(hub) -> bool:
+            cpy = deepcopy(og_cpy)
             next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
             for x in range(2):
                 print(x)
@@ -53,7 +52,7 @@ class DroneNetwork:
 
         self._turn += 1
         def inactive_drones() -> List[Drone]:
-            return [drone for drone in self._drones if drone._progress == 0]
+            return [drone for drone in self._drones if drone.progress == 0]
 
         drones = inactive_drones()
         qty = len(drones)

@@ -145,3 +145,7 @@ class Drone(Entity):
             if self._progress >= 100:
                 self._progress = 0
                 self.pos = self._hub.pos
+
+    @property
+    def progress(self) -> float:
+        return self._progress

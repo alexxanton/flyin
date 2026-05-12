@@ -17,7 +17,7 @@ class Simulation:
 
         self._renderer.start(network)
         while True:
-            if not network.drones_landed():
+            if not network.drones_landed() or network.end_reached():
                 network.update_drones()
             else:
                 network.find_paths()
