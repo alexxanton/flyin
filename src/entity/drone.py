@@ -71,7 +71,7 @@ class Drone(Entity):
                 self._reserved_hub = None
                 next_hub.is_reserved = False
                 already_landed = True
-                if future and future(next_hub):
+                if future and future(self, next_hub):
                     next_hub.available = True
                     print("will")
         self._next_x, self._next_y = next_hub.pos
@@ -149,3 +149,11 @@ class Drone(Entity):
     @property
     def progress(self) -> float:
         return self._progress
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def hub(self) -> Hub:
+        return self._hub
