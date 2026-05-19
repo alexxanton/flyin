@@ -61,7 +61,7 @@ class Drone(Entity):
         if next_hub.zone == "restricted":
             if not self._reserved_hub and (next_hub.has_capacity() or next_hub.available):
                 next_hub.land_on()
-                if next_hub.available:
+                if next_hub.available and not next_hub.has_capacity():
                     print("done")
                     next_hub.available = False
                 next_hub.is_reserved = True
@@ -73,9 +73,13 @@ class Drone(Entity):
                 already_landed = True
                 if future and future(self, next_hub):
                     next_hub.available = True
+                    if not next_hub.has_capacity():
+                        next_hub.extra_capacity += 1
                     print("will")
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
+        if self._hub.extra_capacity > 0 and not self._reserved_hub:
+            self._hub.extra_capacity -= 1
         self._hub = next_hub
         if not already_landed:
             next_hub.land_on()

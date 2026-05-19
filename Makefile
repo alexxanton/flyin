@@ -19,7 +19,7 @@ run: install
 	$(VENV_BIN)/python $(MAIN) config.txt
 
 maps: install
-	$(VENV_BIN)/python $(MAIN) maps
+	$(VENV_BIN)/python $(MAIN) .maps
 
 venv:
 	@if [ ! -d "$(VENV)" ]; then \

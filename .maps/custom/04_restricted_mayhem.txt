@@ -1,6 +1,6 @@
 nb_drones: 100
 start_hub: start 1 0
-hub: middle 3 0 [color=orange max_drones=8]
+hub: middle 3 0 [color=orange max_drones=8 zone=restricted]
 hub: bottle_neck 2 0 [zone=restricted ]
 end_hub: end 5 0
 hub: bad_guy 4 0 [color=red]

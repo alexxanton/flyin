@@ -52,6 +52,7 @@ class Hub(Entity):
         self._is_reserved = False
         self._hub_type = hub_type
         self.available = False
+        self._extra_capacity = 0
 
     @property
     def color(self) -> str:
@@ -85,18 +86,26 @@ class Hub(Entity):
     def is_reserved(self, b: bool) -> None:
         self._is_reserved = b
 
+    @property
+    def extra_capacity(self) -> int:
+        return self._extra_capacity
+
+    @extra_capacity.setter
+    def extra_capacity(self, value) -> None:
+        self._extra_capacity = value
+
     def add_edge(self, edge: Edge) -> None:
         self._edges.append(edge)
 
     def take_off(self) -> None:
         if self._drones_landed <= 0:
-            raise ValueError("Can't take off if there are no drones")
+            raise ValueError(f"{self._name}: Can't take off if there are no drones")
         self._drones_landed -= 1
 
     def land_on(self) -> None:
-        if self._drones_landed >= self._max_drones:
+        if self._drones_landed >= (self._max_drones + self._extra_capacity):
             raise ValueError(f"{self._name}: Max drone capacity exceeded")
         self._drones_landed += 1
 
     def has_capacity(self) -> bool:
-        return self._drones_landed < self._max_drones
+        return self._drones_landed < (self._max_drones + self._extra_capacity)
