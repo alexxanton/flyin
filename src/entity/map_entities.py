@@ -67,6 +67,10 @@ class Hub(Entity):
         return self._zone
 
     @property
+    def drones_landed(self) -> int:
+        return self._drones_landed - self._extra_capacity
+
+    @property
     def max_drones(self) -> int:
         return self._max_drones
 
@@ -91,7 +95,7 @@ class Hub(Entity):
         return self._extra_capacity
 
     @extra_capacity.setter
-    def extra_capacity(self, value) -> None:
+    def extra_capacity(self, value: int) -> None:
         self._extra_capacity = value
 
     def add_edge(self, edge: Edge) -> None:
@@ -99,7 +103,9 @@ class Hub(Entity):
 
     def take_off(self) -> None:
         if self._drones_landed <= 0:
-            raise ValueError(f"{self._name}: Can't take off if there are no drones")
+            raise ValueError(
+                f"{self._name}: Can't take off if there are no drones"
+            )
         self._drones_landed -= 1
 
     def land_on(self) -> None:

@@ -41,7 +41,7 @@ class DroneTransformer(Transformer):
             raise ValueError(f"Unknown zone {meta['zone']}")
 
         if "start" in hub_type or "end" in hub_type:
-            if not "max_drones" in meta:
+            if "max_drones" not in meta:
                 meta["max_drones"] = self._nb_drones
             elif meta["max_drones"] != self._nb_drones:
                 raise ValueError(
@@ -69,7 +69,7 @@ class DroneTransformer(Transformer):
     def connection_line(self, args: List[Any]) -> Dict[str, Any]:
         from_hub, to_hub = str(args[0]), str(args[1])
         for hub in [from_hub, to_hub]:
-            if not hub in self._hub_names:
+            if hub not in self._hub_names:
                 raise ValueError(f"Unkown hub name: {hub}")
 
         connection = (from_hub, to_hub)

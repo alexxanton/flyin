@@ -33,14 +33,13 @@ class MenuItem:
         return self._rect
 
     @rect.setter
-    def rect(self, new_rect: pygame.Rect) -> pygame.Rect:
+    def rect(self, new_rect: pygame.Rect) -> None:
         self._rect = new_rect
 
 
 class Menu:
     def __init__(self, screen: pygame.Surface) -> None:
         self._font = pygame.font.SysFont("Consolas", 24)
-        self._items: List[MenuItem] = []
         self._screen = screen
         self._max_scroll = 0
         self._scroll_y = 0
@@ -64,7 +63,7 @@ class Menu:
         for f in root.glob("*.txt"):
             items.append(MenuItem(f.name, f, True, 0))
 
-        def sort_order(p: Path):
+        def sort_order(p: Path) -> int:
             if not p.is_dir():
                 return 0
 
@@ -94,7 +93,7 @@ class Menu:
         line_height = 40
 
         if len(self._items) == 1 and not self._items[0].path.is_dir():
-            return self._items[0].path
+            return str(self._items[0].path)
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEWHEEL:
@@ -112,7 +111,7 @@ class Menu:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for item in menu_items:
                     if item.is_clickable and item.rect.collidepoint(mouse_pos):
-                        return item.path
+                        return str(item.path)
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
@@ -132,3 +131,4 @@ class Menu:
             text_surf = self._font.render(item.name, True, color)
             screen.blit(text_surf, (x_pos, y_pos))
         pygame.display.flip()
+        return ""

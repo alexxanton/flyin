@@ -68,7 +68,7 @@ class Renderer:
         self,
         screen_size: Tuple[int, int],
         pos: Tuple[int, int],
-        line: bool=False
+        line: bool = False
     ) -> Tuple[int, int]:
         x, y = pos
         width, height = screen_size
@@ -142,7 +142,9 @@ class Renderer:
                     if hub.color == "black":
                         color = "0x222222"
                     sprite = color_image(sprite, color)
-                sprite = pygame.transform.scale(sprite, (self._sprite_size, self._sprite_size))
+                sprite = pygame.transform.scale(
+                    sprite, (self._sprite_size, self._sprite_size)
+                )
                 self._screen.blit(sprite, pos)
 
         def draw_drones() -> None:
@@ -153,7 +155,9 @@ class Renderer:
                     self._drone_sprites[round(self._frame) % sprites_len]
                 )
                 x, y = pos
-                sprite = pygame.transform.scale(sprite, (self._sprite_size, self._sprite_size))
+                sprite = pygame.transform.scale(
+                    sprite, (self._sprite_size, self._sprite_size)
+                )
                 self._screen.blit(sprite, (x, y - 20))
 
         def get_rainbow_color() -> Tuple[int, int, int]:

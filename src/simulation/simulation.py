@@ -1,5 +1,5 @@
 from src.parser import parse_data
-from src.entity import Hub, Drone
+from src.entity import Drone
 from src.network import DroneNetwork
 from src.renderer import Renderer
 import sys
