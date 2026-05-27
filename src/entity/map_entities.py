@@ -12,6 +12,7 @@ class Edge:
         self._max_link_capacity = max_link_capacity
         self._from_hub = from_hub
         self._to_hub = to_hub
+        self._drones = 0
 
     @property
     def hubs(self) -> Tuple[Hub, Hub]:
@@ -22,6 +23,20 @@ class Edge:
     def flipped(self) -> Edge:
         """Returns the edge but reversed."""
         return Edge(self._to_hub, self._from_hub, self._max_link_capacity)
+
+    @property
+    def drones(self) -> int:
+        """Returns the drones traveling within the edge."""
+        return self._drones
+
+    @drones.setter
+    def drones(self, value: int) -> None:
+        """Setter for drones."""
+        self._drones = value
+
+    def has_capacity(self) -> bool:
+        """Returns if the edge has capacity."""
+        return self._drones < self._max_link_capacity
 
     def __lt__(self, other: Edge) -> bool:
         """Defines how to interpret the `less than` operator."""
