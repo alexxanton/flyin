@@ -27,7 +27,7 @@ class Node:
 class Drone(Entity):
     next_id = 1
 
-    def __init__(self, x: int, y: int, hub: Hub) -> None:
+    def __init__(self, x: float, y: float, hub: Hub) -> None:
         """Initialize a drone entity."""
         super().__init__(x, y)
         self._id = Drone.next_id

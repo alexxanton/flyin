@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 from src.network import DroneNetwork
 from .menu import Menu
 import sys
@@ -67,9 +67,9 @@ class Renderer:
     def _translate_pos(
         self,
         screen_size: Tuple[int, int],
-        pos: Tuple[int, int],
+        pos: Tuple[float, float],
         line: bool = False
-    ) -> Tuple[int, int]:
+    ) -> Tuple[float, float]:
         x, y = pos
         width, height = screen_size
         max_x, max_y = self._max_x, self._max_y
@@ -119,7 +119,7 @@ class Renderer:
                     color = pygame.Color(edge.hubs[1].color)
                     color.a = 50
                 except (ValueError, TypeError):
-                    color = "0x111111"
+                    color = pygame.Color(255, 255, 255, 50)
 
                 if edge.hubs[1].color == "rainbow":
                     color = pygame.Color(get_rainbow_color())
@@ -168,7 +168,9 @@ class Renderer:
             color = (r, g, b)
             return color
 
-        def color_image(image: pygame.Surface, color: str) -> pygame.Surface:
+        def color_image(
+            image: pygame.Surface, color: Union[str | Tuple[int, int, int]]
+        ) -> pygame.Surface:
             temp = image.copy()
             try:
                 temp.fill(color, special_flags=pygame.BLEND_RGB_MULT)
@@ -187,10 +189,12 @@ class Renderer:
                 for x in range(0, screen_width, self._sprite_size):
                     if (x + y) % 3:
                         continue
-                    x = x + (self._frame % (screen_width + self._sprite_size))
-                    if x > screen_width:
-                        x = x - screen_width - self._sprite_size
-                    self._screen.blit(bg, (x, y))
+                    x_pos = (
+                        x + (self._frame % (screen_width + self._sprite_size))
+                    )
+                    if x_pos > screen_width:
+                        x_pos = x_pos - screen_width - self._sprite_size
+                    self._screen.blit(bg, (x_pos, y))
 
         self._clock.tick(self._fps)
         self._frame += 0.2

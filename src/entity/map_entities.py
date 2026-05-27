@@ -35,8 +35,8 @@ class Hub(Entity):
     def __init__(
         self,
         name: str,
-        x: int,
-        y: int,
+        x: float,
+        y: float,
         hub_type: str = "normal",
         zone: str = "normal",
         color: str = "none",
