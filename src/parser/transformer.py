@@ -3,7 +3,9 @@ from typing import List, Dict, Tuple, Set, Any, Union
 
 
 class DroneTransformer(Transformer):
+    """Parser transformer for the drone network."""
     def __init__(self) -> None:
+        """Initialize the transformer."""
         self._nb_drones = 0
         self._hub_names: Set[str] = set()
         self._hub_positions: Set[int] = set()
@@ -16,6 +18,7 @@ class DroneTransformer(Transformer):
         }
 
     def nb_drones(self, args: List[Any]) -> Dict[str, int]:
+        """Defines how to return nb_drones."""
         val = int(args[0])
         if val < 0:
             raise ValueError("nb_drones must be a positive integer")
@@ -23,6 +26,7 @@ class DroneTransformer(Transformer):
         return {"nb_drones": val}
 
     def name_coord(self, args: List[Any]) -> Tuple[str, int, int]:
+        """Defines how to return name_coord."""
         name, x, y = str(args[0]), int(args[1]), int(args[2])
         if name in self._hub_names:
             raise ValueError(f"Duplicate zone name: {name}")
@@ -30,6 +34,7 @@ class DroneTransformer(Transformer):
         return name, x, -y
 
     def hub_line(self, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return hub_line."""
         hub_type = str(args[0])
         meta = args[2]
 
@@ -51,22 +56,26 @@ class DroneTransformer(Transformer):
         return {"type": hub_type, "params": args[1], "metadata": meta}
 
     def pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+        """Defines how to return pair."""
         return (
             str(args[0]), int(args[1]) if args[1].isnumeric() else str(args[1])
         )
 
     def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
+        """Defines how to return metadata."""
         if not args:
             return {}
         return dict(args[0])
 
     def attributes(self, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return attributes."""
         attrs = {}
         for k, v in args:
             attrs[k] = v
         return attrs
 
     def connection_line(self, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return connection_line."""
         from_hub, to_hub = str(args[0]), str(args[1])
         for hub in [from_hub, to_hub]:
             if hub not in self._hub_names:
@@ -84,4 +93,5 @@ class DroneTransformer(Transformer):
         }
 
     def start(self, args: List[Any]) -> List[Any]:
+        """Defines how to return start."""
         return args

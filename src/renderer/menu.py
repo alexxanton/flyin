@@ -5,7 +5,9 @@ import sys
 
 
 class MenuItem:
+    """Represents a selectable item for the menu."""
     def __init__(self, name: str, path: Path, clickable: bool, depth: int) -> None:
+        """Initialize the menu item."""
         self._name = name
         self._path = path
         self._clickable = clickable
@@ -14,31 +16,39 @@ class MenuItem:
 
     @property
     def name(self) -> str:
+        """Returns the item name."""
         return self._name
 
     @property
     def path(self) -> Path:
+        """Returns the item path."""
         return self._path
 
     @property
     def depth(self) -> int:
+        """Returns the item depth."""
         return self._depth
 
     @property
     def is_clickable(self) -> bool:
+        """Returns if the item is clickable."""
         return self._clickable
 
     @property
     def rect(self) -> pygame.Rect:
+        """Returns the item rect."""
         return self._rect
 
     @rect.setter
     def rect(self, new_rect: pygame.Rect) -> None:
+        """Setter for rect."""
         self._rect = new_rect
 
 
 class Menu:
+    """Holds all the items and displays them as a list."""
     def __init__(self, screen: pygame.Surface) -> None:
+        """Initialize the menu."""
         self._font = pygame.font.SysFont("Consolas", 24)
         self._screen = screen
         self._max_scroll = 0
@@ -47,9 +57,11 @@ class Menu:
 
     @property
     def items(self) -> List[MenuItem]:
+        """Returns the menu items."""
         return self._items
 
     def _get_menu_items(self) -> List[MenuItem]:
+        """Get the items from a directory."""
         if len(sys.argv) < 2:
             sys.exit("Config file not provided.")
 
@@ -86,6 +98,7 @@ class Menu:
         return items
 
     def display_menu(self) -> str:
+        """Displays the items as a list."""
         screen = self._screen
         screen.fill((30, 30, 30))
         mouse_pos = pygame.mouse.get_pos()

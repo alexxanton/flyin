@@ -1,17 +1,20 @@
 from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
-from typing import List, Set
+from typing import List, Set, Optional
 from collections import deque
 import sys
 
 
 class Node:
-    def __init__(self, hub: Hub, prev: Node) -> None:
+    """Node point for the pathfinding algorithm."""
+    def __init__(self, hub: Hub, prev: Optional[Node]) -> None:
+        """Initialize a node entity."""
         self._hub = hub
         self._prev = prev
 
     def get_path(self) -> List[Hub]:
+        """Get the path leading to the first node and reverse it."""
         path: List[Hub] = [self._hub]
         node = self._prev
         while node:
@@ -21,10 +24,12 @@ class Node:
 
     @property
     def hub(self) -> Hub:
+        """Returns the hub associated with a node."""
         return self._hub
 
 
 class Drone(Entity):
+    """Drone entity with pathfinding capabilities."""
     next_id = 1
 
     def __init__(self, x: float, y: float, hub: Hub) -> None:
@@ -33,14 +38,14 @@ class Drone(Entity):
         self._id = Drone.next_id
         Drone.next_id += 1
         self._hub = hub
-        self._progress = 0
+        self._progress = 0.0
         self._hub.land_on()
         self._og_x = x
         self._og_y = y
         self._next_x = x
         self._next_y = y
         self._speed = 2
-        self._reserved_hub: Hub | None = None
+        self._reserved_hub: Optional[Hub] = None
         self._copy = False
 
     def _create_temp_hub(self, next_hub: Hub) -> Hub:
@@ -57,6 +62,7 @@ class Drone(Entity):
         return temp_hub
 
     def _fly_to_hub(self, next_hub: Hub, future=None) -> None:
+        """Travel to the next hub."""
         already_landed = False
         self._og_x, self._og_y = self._hub.pos
         if next_hub.zone == "restricted":
@@ -79,7 +85,6 @@ class Drone(Entity):
                 next_hub.available = False
                 if future and future(self, next_hub):
                     next_hub.available = True
-                    #print("will")
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
         if self._hub.extra_capacity > 0 and not self._reserved_hub:
@@ -92,7 +97,9 @@ class Drone(Entity):
             print(f"D{self._id}-{next_hub.name}", end=" ")
 
     def _find_path(self) -> List[Hub]:
-        def get_neighbors(node: Node):
+        """Execute the pathfinding algorithm."""
+        def get_neighbors(node: Node) -> List[Node]:
+            """Get hubs that connect with the current hub."""
             edges = sorted(node._hub.edges)
             return [Node(edge.hubs[1], node) for edge in edges]
 
@@ -122,6 +129,7 @@ class Drone(Entity):
         return []
 
     def next_move(self, future) -> None:
+        """Execute the next move whether it has to move or wait."""
         hubs = self._find_path()
 
         if len(hubs) < 1:
@@ -160,12 +168,15 @@ class Drone(Entity):
 
     @property
     def progress(self) -> float:
+        """Returns the progress of the trajectory between two hubs."""
         return self._progress
 
     @property
     def id(self) -> int:
+        """Returns the drone ID."""
         return self._id
 
     @property
     def hub(self) -> Hub:
+        """Returns the hub where the drone is positioned at."""
         return self._hub

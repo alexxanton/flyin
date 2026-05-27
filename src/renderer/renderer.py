@@ -10,6 +10,7 @@ from math import sin
 class Renderer:
     """Renders the drone network using pygame"""
     def __init__(self) -> None:
+        """Initialize the renderer."""
         pygame.init()
         pygame.display.set_caption("Fly-in Drone-out")
         screen_size = pygame.display.get_desktop_sizes()[0]
@@ -33,6 +34,7 @@ class Renderer:
         self._font = pygame.font.SysFont("Consolas", 35 if big_screen else 20)
 
     def start(self, network: DroneNetwork) -> None:
+        """Start the rendering interface."""
         self._network = network
         xs, ys = zip(*(hub.pos for hub in network.hubs))
         self._max_x = max(xs)
@@ -49,6 +51,7 @@ class Renderer:
             self._min_y = 0
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:
+        """Load hub sprites from folder as a dict."""
         path = Path("src/renderer/sprites/hub_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return {
@@ -57,6 +60,7 @@ class Renderer:
         }
 
     def _load_sprites(self, name: str) -> List[pygame.Surface]:
+        """Load any sprites from folder as a list."""
         path = Path(f"src/renderer/sprites/{name}_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return [
@@ -70,6 +74,7 @@ class Renderer:
         pos: Tuple[float, float],
         line: bool = False
     ) -> Tuple[float, float]:
+        """Translate the position according to the screen size."""
         x, y = pos
         width, height = screen_size
         max_x, max_y = self._max_x, self._max_y
@@ -96,16 +101,19 @@ class Renderer:
         return x, y
 
     def choose_file(self) -> str:
+        """Render the menu until a file is chosen."""
         file = ""
         while not file:
             file = self._menu.display_menu()
         return file
 
     def display(self) -> None:
+        """Display the drone network."""
         self._screen.fill("0x222034")
         screen_size = self._screen.get_size()
 
         def draw_edges() -> None:
+            """Draw edges from the drone network."""
             edges = self._network.edges
             lines_surface = pygame.Surface(
                 self._screen.get_size(), pygame.SRCALPHA
@@ -130,6 +138,7 @@ class Renderer:
             self._screen.blit(lines_surface, (0, 0))
 
         def draw_hubs() -> None:
+            """Draw hubs from the drone network."""
             for hub in self._network.hubs:
                 pos = self._translate_pos(screen_size, hub.pos)
                 sprite = self._hub_sprites[
@@ -148,6 +157,7 @@ class Renderer:
                 self._screen.blit(sprite, pos)
 
         def draw_drones() -> None:
+            """Draw drones from the drone network."""
             sprites_len = len(self._drone_sprites)
             for drone in self._network.drones:
                 pos = self._translate_pos(screen_size, drone.pos)
@@ -161,6 +171,7 @@ class Renderer:
                 self._screen.blit(sprite, (x, y - 20))
 
         def get_rainbow_color() -> Tuple[int, int, int]:
+            """Get a color from the current frame and apply a sin wave."""
             frame = self._frame * 0.5
             r = int(sin(frame) * 127 + 128)
             g = int(sin(frame + 2) * 127 + 128)
@@ -171,6 +182,7 @@ class Renderer:
         def color_image(
             image: pygame.Surface, color: Union[str | Tuple[int, int, int]]
         ) -> pygame.Surface:
+            """Tint an image."""
             temp = image.copy()
             try:
                 temp.fill(color, special_flags=pygame.BLEND_RGB_MULT)
@@ -179,6 +191,7 @@ class Renderer:
             return temp
 
         def draw_bg() -> None:
+            """Render the background."""
             screen_width, screen_height = screen_size
             sprites_len = len(self._bg_sprites)
             bg = (
@@ -209,6 +222,7 @@ class Renderer:
         pygame.display.flip()
 
     def handle_events(self) -> str:
+        """Handle pygame events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()

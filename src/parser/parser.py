@@ -1,5 +1,5 @@
 from lark import Lark
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, cast
 from .transformer import DroneTransformer
 import sys
 
@@ -32,6 +32,7 @@ drone_grammar = r"""
 
 
 def parse_data(file: str) -> List[Dict[str, Any]]:
+    """Parse data from file."""
     data = ""
     try:
         with open(file, "r") as f:
@@ -44,7 +45,9 @@ def parse_data(file: str) -> List[Dict[str, Any]]:
     )
 
     try:
-        parsed_data: List[Dict[str, Union[int, str]]] = parser.parse(data)
+        parsed_data = cast(
+            List[Dict[str, Union[int, str]]], parser.parse(data)
+        )
     except Exception as e:
         sys.exit(str(e))
 

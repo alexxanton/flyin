@@ -1,11 +1,12 @@
 from src.entity import Hub, Edge, Drone
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from copy import deepcopy
 
 
 class DroneNetwork:
     """Represents a network of drones."""
     def __init__(self) -> None:
+        """Initialize the drone network."""
         self._nb_drones = 0
         self._hubs: List[Hub] = []
         self._edges: List[Edge] = []
@@ -36,6 +37,7 @@ class DroneNetwork:
         return all([drone.progress == 0 for drone in self._drones])
 
     def find_paths(self) -> None:
+        """Make all the drones find the path to the end goal."""
         og_cpy = deepcopy(self)
         og_cpy._copy = True
 
@@ -43,6 +45,7 @@ class DroneNetwork:
             cpy = deepcopy(og_cpy)
             for d in cpy._drones:
                 d._copy = True
+
             next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
             cpy_drone = next((d for d in cpy._drones if d.id == drone.id), None)
             for x in range(2):
@@ -51,11 +54,14 @@ class DroneNetwork:
                     cpy.update_drones()
 
             #print(next_hub.name, next_hub._drones_landed)
+            if not next_hub or not cpy_drone:
+                return False
             return cpy_drone.hub.name != next_hub.name
 
         self._turn += 1
 
         def inactive_drones() -> List[Drone]:
+            """Return a list of inactive drones."""
             return [drone for drone in self._drones if drone.progress == 0]
 
         drones = inactive_drones()
@@ -72,10 +78,12 @@ class DroneNetwork:
             print()
 
     def update_drones(self) -> None:
+        """Update all the drones."""
         for drone in self._drones:
             drone.update()
 
     def _get_hub_by_id(self, name_id: str) -> Hub:
+        """Return a hub by its ID."""
         hub = next((
             h for h in self._hubs if h.name == name_id
         ), None)
@@ -104,16 +112,20 @@ class DroneNetwork:
 
     @property
     def hubs(self) -> List[Hub]:
+        """Returns the network hubs."""
         return self._hubs
 
     @property
     def edges(self) -> List[Edge]:
+        """Returns the network edges."""
         return self._edges
 
     @property
     def drones(self) -> List[Drone]:
+        """Returns the network drones."""
         return self._drones
 
     @property
     def turn(self) -> int:
+        """Returns the current turn."""
         return self._turn

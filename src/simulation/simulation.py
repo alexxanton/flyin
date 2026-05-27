@@ -6,10 +6,13 @@ import sys
 
 
 class Simulation:
+    """Simulation orchestrator."""
     def __init__(self) -> None:
+        """Initialize the simulation."""
         self._renderer = Renderer()
 
     def _run_simulation(self) -> None:
+        """Run the simulation."""
         file = self._renderer.choose_file()
         data = parse_data(file)
         network = DroneNetwork()
@@ -26,6 +29,7 @@ class Simulation:
                 break
 
     def start(self) -> None:
+        """Start the simulation."""
         while True:
             Drone.next_id = 1
             self._run_simulation()
