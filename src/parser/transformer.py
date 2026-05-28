@@ -45,6 +45,9 @@ class DroneTransformer(Transformer):
         if "zone" in meta and meta["zone"] not in self._valid_zones:
             raise ValueError(f"Unknown zone {meta['zone']}")
 
+        if "max_drones" in meta and meta["max_drones"] < 1:
+            raise ValueError("max_drones can't be smaller than 1")
+
         if "start" in hub_type or "end" in hub_type:
             if "max_drones" not in meta:
                 meta["max_drones"] = self._nb_drones
@@ -58,7 +61,8 @@ class DroneTransformer(Transformer):
     def pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
         return (
-            str(args[0]), int(args[1]) if args[1].isnumeric() else str(args[1])
+            str(args[0]),
+            int(args[1]) if args[1].lstrip("-").isnumeric() else str(args[1])
         )
 
     def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
@@ -85,11 +89,14 @@ class DroneTransformer(Transformer):
         if connection in self._connections:
             raise ValueError(f"Repeated connection {connection}")
         self._connections.add(connection)
+        meta = args[2]
+        if "max_link_capacity" in meta and meta["max_link_capacity"] < 1:
+            raise ValueError("max_link_capacity can't be smaller than 1")
 
         return {
             "type": "connection",
             "params": connection,
-            "metadata": args[2]
+            "metadata": meta
         }
 
     def start(self, args: List[Any]) -> List[Any]:
