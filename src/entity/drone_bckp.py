@@ -8,27 +8,18 @@ import sys
 
 class Node:
     """Node point for the pathfinding algorithm."""
-
-    def __init__(
-        self,
-        hub: Hub,
-        prev: Optional["Node"],
-        edge: Optional[Edge] = None
-    ) -> None:
+    def __init__(self, hub: Hub, prev: Optional[Node]) -> None:
         """Initialize a node entity."""
         self._hub = hub
         self._prev = prev
-        self._edge = edge
 
-    def get_path(self) -> List[Edge]:
-        """Get the path leading to the first node."""
-        path: List[Edge] = []
-        node: Optional["Node"] = self
-
-        while node and node._edge:
-            path.append(node._edge)
+    def get_path(self) -> List[Hub]:
+        """Get the path leading to the first node and reverse it."""
+        path: List[Hub] = [self._hub]
+        node = self._prev
+        while node:
+            path.append(node._hub)
             node = node._prev
-
         return path[::-1]
 
     @property
@@ -63,32 +54,17 @@ class Drone(Entity):
         """
         x, y = self._hub.pos
         nx, ny = next_hub.pos
-
         half_x = (nx - x) * 50 / 100 + x
         half_y = (ny - y) * 50 / 100 + y
-
-        temp_hub = Hub(
-            f"{self._hub.name}/{next_hub.name}",
-            half_x,
-            half_y
-        )
-
+        temp_hub = Hub(f"{self._hub.name}/{next_hub.name}", half_x, half_y)
         edge = Edge(temp_hub, next_hub)
         temp_hub.add_edge(edge)
-
         return temp_hub
 
-    def _fly_to_hub(
-        self,
-        edge: Edge,
-        future=None
-    ) -> None:
+    def _fly_to_hub(self, next_hub: Hub, future=None) -> None:
         """Travel to the next hub."""
         already_landed = False
-        next_hub = edge.hubs[1]
-
         self._og_x, self._og_y = self._hub.pos
-
         if next_hub.zone == "restricted":
             if (
                 not self._reserved_hub
@@ -96,57 +72,44 @@ class Drone(Entity):
             ):
                 if next_hub.available and not next_hub.has_capacity():
                     next_hub.available = False
-
                     if not next_hub.has_capacity():
                         next_hub.extra_capacity += 1
-
                 next_hub.land_on()
                 next_hub.is_reserved = True
                 self._reserved_hub = next_hub
                 next_hub = self._create_temp_hub(next_hub)
-
             else:
                 self._reserved_hub = None
                 next_hub.is_reserved = False
                 already_landed = True
                 next_hub.available = False
-
                 if future and future(self, next_hub):
                     next_hub.available = True
-
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
-
         if self._hub.extra_capacity > 0 and not self._reserved_hub:
             self._hub.extra_capacity -= 1
         self._hub = next_hub
-
         if not already_landed:
             next_hub.land_on()
         self._progress += 1
-
         if not self._copy:
             print(f"D{self._id}-{next_hub.name}", end=" ")
 
-    def _find_path(self) -> List[Edge]:
+    def _find_path(self) -> List[Hub]:
         """Execute the pathfinding algorithm."""
-
         def get_neighbors(node: Node) -> List[Node]:
-            """Get edges that connect with the current hub."""
-            edges = sorted(node.hub.edges)
-
-            return [
-                Node(edge.hubs[1], node, edge)
-                for edge in edges
-            ]
+            """Get hubs that connect with the current hub."""
+            edges = sorted(node._hub.edges)
+            return [Node(edge.hubs[1], node) for edge in edges]
 
         visited: Set[Hub] = set()
         start = Node(self._hub, None)
 
+        queue = deque(get_neighbors(start))
+
         if start.hub.hub_type == "end_hub":
             return []
-
-        queue = deque(get_neighbors(start))
 
         while queue:
             node = queue.popleft()
@@ -160,17 +123,19 @@ class Drone(Entity):
             visited.add(node.hub)
             queue.extend(get_neighbors(node))
 
-        sys.exit("Unsolvable map!")
+        if node.hub.hub_type != "end_hub":
+            sys.exit("Unsolvable map!")
+
+        return []
 
     def next_move(self, future) -> None:
         """Execute the next move whether it has to move or wait."""
-        edges = self._find_path()
+        hubs = self._find_path()
 
-        if not edges:
+        if len(hubs) < 1:
             return
 
-        next_edge = edges[0]
-        next_hub = next_edge.hubs[1]
+        next_hub = hubs[1]
 
         if (
             not next_hub.has_capacity()
@@ -181,16 +146,12 @@ class Drone(Entity):
 
         if next_hub.zone == "restricted":
             if next_hub.is_reserved or next_hub.available:
-                if (
-                    self._reserved_hub == next_hub
-                    or next_hub.available
-                ):
-                    self._fly_to_hub(next_edge, future)
+                if self._reserved_hub == next_hub or next_hub.available:
+                    self._fly_to_hub(next_hub, future)
                     return
 
         try:
-            self._fly_to_hub(next_edge)
-
+            self._fly_to_hub(next_hub)
         except ValueError as e:
             print(e)
 
@@ -198,21 +159,9 @@ class Drone(Entity):
         """Update the drone position."""
         if self._progress > 0:
             self._progress += self._speed * 0.7
-
-            x = (
-                (self._next_x - self._og_x)
-                * self._progress / 100
-                + self._og_x
-            )
-
-            y = (
-                (self._next_y - self._og_y)
-                * self._progress / 100
-                + self._og_y
-            )
-
+            x = (self._next_x - self._og_x) * self._progress / 100 + self._og_x
+            y = (self._next_y - self._og_y) * self._progress / 100 + self._og_y
             self.pos = (x, y)
-
             if self._progress >= 100:
                 self._progress = 0
                 self.pos = self._hub.pos
