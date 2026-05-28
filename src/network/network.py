@@ -95,7 +95,8 @@ class DroneNetwork:
         """Add an entity from the parsed line."""
 
         if "hub" in line["type"]:
-            hub = Hub(*line["params"], line["type"], **line["metadata"])
+            params = *line["params"], line["type"]
+            hub = Hub(*params, **line["metadata"])
             self._hubs.append(hub)
             if "start" in line["type"]:
                 self._start_hub: Hub = hub
