@@ -56,6 +56,7 @@ class Drone(Entity):
         self._speed = 2
         self._reserved_hub: Optional[Hub] = None
         self._copy = False
+        self._edge: Optional[Edge] = None
 
     def _create_temp_hub(self, next_hub: Hub) -> Hub:
         """
@@ -85,6 +86,7 @@ class Drone(Entity):
     ) -> None:
         """Travel to the next hub."""
         already_landed = False
+        change_edge = True
         next_hub = edge.hubs[1]
 
         self._og_x, self._og_y = self._hub.pos
@@ -101,6 +103,7 @@ class Drone(Entity):
                         next_hub.extra_capacity += 1
 
                 next_hub.land_on()
+                self._edge = edge
                 next_hub.is_reserved = True
                 self._reserved_hub = next_hub
                 next_hub = self._create_temp_hub(next_hub)
@@ -110,12 +113,17 @@ class Drone(Entity):
                 next_hub.is_reserved = False
                 already_landed = True
                 next_hub.available = False
+                change_edge = False
 
                 if future and future(self, next_hub):
                     next_hub.available = True
 
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
+
+        edge.drones += 1
+        if not self._reserved_hub and change_edge:
+            self._edge = edge
 
         if self._hub.extra_capacity > 0 and not self._reserved_hub:
             self._hub.extra_capacity -= 1
@@ -166,11 +174,18 @@ class Drone(Entity):
         """Execute the next move whether it has to move or wait."""
         edges = self._find_path()
 
+        if self._edge and not self._reserved_hub:
+            self._edge.drones -= 1
+            self._edge = None
+
         if not edges:
             return
 
         next_edge = edges[0]
         next_hub = next_edge.hubs[1]
+
+        if not edges[0].has_capacity():
+            return
 
         if (
             not next_hub.has_capacity()

@@ -47,6 +47,7 @@ class Edge:
             "blocked": 3
         }
         value = values[self._to_hub.zone] - (self._to_hub._drones_landed == 0)
+        value -= self.has_capacity() * 2
         return value < values[other._to_hub.zone]
 
 
