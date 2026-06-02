@@ -1,5 +1,5 @@
 from src.entity import Hub, Edge, Drone
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from copy import deepcopy
 
 
@@ -67,7 +67,7 @@ class DroneNetwork:
         if not self._copy:
             capacity_dict = self._future_simulation()
 
-        def future_capacity(drone: Drone, hub: Hub) -> bool:
+        def future_capacity(drone: Drone) -> bool:
             """Returns the future capacity stored in the dictionary."""
             if not capacity_dict:
                 return False

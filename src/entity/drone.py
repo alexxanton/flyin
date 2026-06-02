@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .entity import Entity
 from .map_entities import Hub, Edge
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Callable
 from collections import deque
 import sys
 
@@ -12,7 +12,7 @@ class Node:
     def __init__(
         self,
         hub: Hub,
-        prev: Optional["Node"],
+        prev: Optional[Node],
         edge: Optional[Edge] = None
     ) -> None:
         """Initialize a node entity."""
@@ -23,7 +23,7 @@ class Node:
     def get_path(self) -> List[Edge]:
         """Get the path leading to the first node."""
         path: List[Edge] = []
-        node: Optional["Node"] = self
+        node: Optional[Node] = self
 
         while node and node._edge:
             path.append(node._edge)
@@ -82,7 +82,7 @@ class Drone(Entity):
     def _fly_to_hub(
         self,
         edge: Edge,
-        future=None
+        future: Optional[Callable[[Drone], bool]] = None
     ) -> None:
         """Travel to the next hub."""
         already_landed = False
@@ -115,7 +115,7 @@ class Drone(Entity):
                 next_hub.available = False
                 change_edge = False
 
-                if future and future(self, next_hub):
+                if future and future(self):
                     next_hub.available = True
 
         self._next_x, self._next_y = next_hub.pos
@@ -170,7 +170,7 @@ class Drone(Entity):
 
         sys.exit("Unsolvable map!")
 
-    def next_move(self, future) -> None:
+    def next_move(self, future: Optional[Callable[[Drone], bool]]) -> None:
         """Execute the next move whether it has to move or wait."""
         edges = self._find_path()
 

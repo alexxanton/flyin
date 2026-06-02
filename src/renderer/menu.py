@@ -6,7 +6,9 @@ import sys
 
 class MenuItem:
     """Represents a selectable item for the menu."""
-    def __init__(self, name: str, path: Path, clickable: bool, depth: int) -> None:
+    def __init__(
+        self, name: str, path: Path, clickable: bool, depth: int
+    ) -> None:
         """Initialize the menu item."""
         self._name = name
         self._path = path
