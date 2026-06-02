@@ -1,4 +1,4 @@
-from src.parser import parse_data
+from src.parser import Parser
 from src.entity import Drone
 from src.network import DroneNetwork
 from src.renderer import Renderer
@@ -13,7 +13,8 @@ class Simulation:
     def _run_simulation(self) -> None:
         """Run the simulation."""
         file = self._renderer.choose_file()
-        data = parse_data(file)
+        parser = Parser()
+        data = parser.parse_data(file)
         network = DroneNetwork()
         network.create_network(data)
 

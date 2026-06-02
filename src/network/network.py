@@ -1,6 +1,7 @@
 from src.entity import Hub, Edge, Drone
 from typing import List, Dict, Any
 from copy import deepcopy
+import sys
 
 
 class DroneNetwork:
@@ -21,6 +22,12 @@ class DroneNetwork:
                 self._add_entity(line)
             else:
                 self._nb_drones = line["nb_drones"]
+
+        if (
+            not getattr(self, "_start_hub", None) or
+            not getattr(self, "_end_hub", None)
+        ):
+            sys.exit("Error: start_hub and end_hub must be provided")
 
         start_x, start_y = self._start_hub.pos
         self._drones = [
