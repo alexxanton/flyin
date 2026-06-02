@@ -246,3 +246,8 @@ class Drone(Entity):
     def hub(self) -> Hub:
         """Returns the hub where the drone is positioned at."""
         return self._hub
+
+    @property
+    def reserved_hub(self) -> Optional[Hub]:
+        """Returns the drone's reserved hub."""
+        return self._reserved_hub

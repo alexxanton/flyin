@@ -36,27 +36,42 @@ class DroneNetwork:
         """Checks if all the drones have reached their objective."""
         return all([drone.progress == 0 for drone in self._drones])
 
+    def _future_simulation(self) -> Dict[int, bool]:
+        """Simulates two turns ahead to know the future drone positions."""
+        if not any([d.reserved_hub for d in self._drones]):
+            return {}
+
+        cpy = deepcopy(self)
+        cpy._copy = True
+        drones = cpy._drones
+        hubs = {}
+
+        for d in drones:
+            hubs[d.id] = d.hub
+            d._copy = True
+
+        for x in range(2):
+            cpy.find_paths()
+            while not cpy.drones_landed():
+                cpy.update_drones()
+
+        future_capacity = {}
+        for d in drones:
+            future_capacity[d.id] = d.hub != hubs[d.id]
+        return future_capacity
+
     def find_paths(self) -> None:
         """Make all the drones find the path to the end goal."""
-        og_cpy = deepcopy(self)
-        og_cpy._copy = True
+        capacity_dict = {}
 
-        def _future(drone: Drone, hub: Hub) -> bool:
-            cpy = deepcopy(og_cpy)
-            for d in cpy._drones:
-                d._copy = True
+        if not self._copy:
+            capacity_dict = self._future_simulation()
 
-            next_hub = next((h for h in cpy._hubs if h.name == hub.name), None)
-            cpy_drone = next((d for d in cpy._drones if d.id == drone.id), None)
-            for x in range(2):
-                cpy.find_paths()
-                while not cpy.drones_landed():
-                    cpy.update_drones()
-
-            #print(next_hub.name, next_hub._drones_landed)
-            if not next_hub or not cpy_drone:
+        def future_capacity(drone: Drone, hub: Hub) -> bool:
+            """Returns the future capacity stored in the dictionary."""
+            if not capacity_dict:
                 return False
-            return cpy_drone.hub.name != next_hub.name
+            return capacity_dict[drone.id]
 
         self._turn += 1
 
@@ -72,7 +87,7 @@ class DroneNetwork:
             drones = inactive_drones()
             qty = len(drones)
             for drone in drones:
-                drone.next_move(_future if not self._copy else None)
+                drone.next_move(future_capacity if not self._copy else None)
             prev_qty = qty
         if not self._copy:
             print()

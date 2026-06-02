@@ -73,7 +73,7 @@ class Hub(Entity):
         self._max_drones = max_drones
         self._is_reserved = False
         self._hub_type = hub_type
-        self.available = False
+        self._available = False
         self._extra_capacity = 0
 
     @property
@@ -130,6 +130,16 @@ class Hub(Entity):
     def extra_capacity(self, value: int) -> None:
         """Setter for extra_capacity."""
         self._extra_capacity = value
+
+    @property
+    def available(self) -> bool:
+        """Returns the hub availability."""
+        return self._available
+
+    @available.setter
+    def available(self, value: bool) -> None:
+        """Setter for available."""
+        self._available = value
 
     def add_edge(self, edge: Edge) -> None:
         """Add an edge to a hub."""
