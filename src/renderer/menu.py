@@ -53,7 +53,11 @@ class Menu:
         self._screen = screen
         self._max_scroll = 0
         self._scroll_y = 0
-        self._items: List[MenuItem] = self._get_menu_items()
+
+        try:
+            self._items: List[MenuItem] = self._get_menu_items()
+        except OSError as e:
+            sys.exit(str(e))
 
     @property
     def items(self) -> List[MenuItem]:
