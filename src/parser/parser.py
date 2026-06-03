@@ -32,6 +32,7 @@ class Parser:
     """
 
     def _format_error(self, e: UnexpectedToken, text: str) -> str:
+        """Format the error message to make it user-friendly."""
         TOKEN_HINTS = {
             "SIGNED_INT": "a number",
             "NAME": "hub name",

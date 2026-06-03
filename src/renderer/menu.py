@@ -82,6 +82,7 @@ class Menu:
             items.append(MenuItem(f.name, f, True, 0))
 
         def sort_order(p: Path) -> int:
+            """Defines how menu categories have to be ordered."""
             if not p.is_dir():
                 return 0
 
