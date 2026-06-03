@@ -103,6 +103,5 @@ class DroneTransformer(Transformer):
         """Defines how to return start."""
         return args
 
-    def line(self, args):
-        print(args)
+    def line(self, args: List[Any]) -> Dict[str, Any]:
         return dict(args[0])

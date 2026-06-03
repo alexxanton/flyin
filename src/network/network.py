@@ -20,9 +20,7 @@ class DroneNetwork:
         for line in data:
             if "type" in line:
                 self._add_entity(line)
-            elif isinstance(line, dict):
-                print(type(line))
-                print(line)
+            else:
                 self._nb_drones = line.get("nb_drones")
 
         if (

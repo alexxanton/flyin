@@ -10,24 +10,25 @@ class Parser:
 
         ?line: (hub_line | connection_line) _nl
 
-        nb_drones: "nb_drones: " SIGNED_INT
-        hub_line: HUB_TYPE ": " name_coord metadata
-        connection_line: "connection: " NAME "-" NAME metadata
+        nb_drones: "nb_drones:" SIGNED_INT _nl
+        hub_line: HUB_TYPE ":" name_coord metadata
+        connection_line: "connection:" NAME "-" NAME metadata
 
-        metadata: (" " attributes)?
-        name_coord: NAME " " SIGNED_INT " " SIGNED_INT
-        attributes: "[" pair (" " pair)* "]"
+        metadata: attributes?
+        name_coord: NAME SIGNED_INT SIGNED_INT
+        attributes: "[" pair (pair)* "]"
         pair: NAME "=" (NAME | SIGNED_INT)
 
         HUB_TYPE: "start_hub" | "end_hub" | "hub"
         NAME: /[a-zA-Z0-9_]+/
         COMMENT: /#[^\n]*/
         NEWLINE: /\r?\n+/
-        _nl: (NEWLINE | COMMENT)
+        _nl: (NEWLINE | (COMMENT NEWLINE))
 
         %import common.SIGNED_INT
-        %import common.WS
+        %import common.WS_INLINE
         %ignore COMMENT
+        %ignore WS_INLINE
     """
 
     def _format_error(self, e: UnexpectedToken, text: str) -> str:
@@ -41,7 +42,7 @@ class Parser:
         expected = ", ".join(sorted(e.expected)) if e.expected else ""
 
         return (
-            f"Syntax error at line {e.line}, column {e.column}:\n"
+            f"\nSyntax error at line {e.line}, column {e.column}:\n"
             f"{text.splitlines()[e.line - 1]}\n"
             f"{'^':>{e.column}}\n"
             f"Expected: {TOKEN_HINTS.get(expected, e.expected)}\n"
