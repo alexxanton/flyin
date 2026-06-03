@@ -8,15 +8,15 @@ class Parser:
     DRONE_GRAMMAR = r"""
         start: nb_drones _nl* line+
 
-        ?line: hub_line | connection_line
+        ?line: (hub_line | connection_line) _nl
 
-        nb_drones: "nb_drones:" SIGNED_INT
-        hub_line: HUB_TYPE ":" name_coord metadata
-        connection_line: "connection:" NAME "-" NAME metadata
+        nb_drones: "nb_drones: " SIGNED_INT
+        hub_line: HUB_TYPE ": " name_coord metadata
+        connection_line: "connection: " NAME "-" NAME metadata
 
-        metadata: attributes?
-        name_coord: NAME SIGNED_INT SIGNED_INT
-        attributes: "[" pair (pair)* "]"
+        metadata: (" " attributes)?
+        name_coord: NAME " " SIGNED_INT " " SIGNED_INT
+        attributes: "[" pair (" " pair)* "]"
         pair: NAME "=" (NAME | SIGNED_INT)
 
         HUB_TYPE: "start_hub" | "end_hub" | "hub"
@@ -28,7 +28,6 @@ class Parser:
         %import common.SIGNED_INT
         %import common.WS
         %ignore COMMENT
-        %ignore WS
     """
 
     def _format_error(self, e: UnexpectedToken, text: str) -> str:

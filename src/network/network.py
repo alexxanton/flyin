@@ -20,8 +20,10 @@ class DroneNetwork:
         for line in data:
             if "type" in line:
                 self._add_entity(line)
-            else:
-                self._nb_drones = line["nb_drones"]
+            elif isinstance(line, dict):
+                print(type(line))
+                print(line)
+                self._nb_drones = line.get("nb_drones")
 
         if (
             not getattr(self, "_start_hub", None) or
