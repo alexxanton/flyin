@@ -1,18 +1,20 @@
 from __future__ import annotations
 from .entity import Entity
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 
 class Edge:
     """Represents a connection between two hubs."""
     def __init__(
-        self, from_hub: Hub, to_hub: Hub, max_link_capacity: int = 1
+        self, from_hub: Hub, to_hub: Hub, max_link_capacity: int = 1,
+        original: Optional[Edge] = None
     ) -> None:
         """Initialize an edge entity."""
         self._max_link_capacity = max_link_capacity
         self._from_hub = from_hub
         self._to_hub = to_hub
         self._drones = 0
+        self._original = original
 
     @property
     def hubs(self) -> Tuple[Hub, Hub]:
@@ -22,7 +24,14 @@ class Edge:
     @property
     def flipped(self) -> Edge:
         """Returns the edge but reversed."""
-        return Edge(self._to_hub, self._from_hub, self._max_link_capacity)
+        return Edge(
+            self._to_hub, self._from_hub, self._max_link_capacity, self
+        )
+
+    @property
+    def original(self) -> Optional[Edge]:
+        """Returns the original instance of an edge."""
+        return self._original
 
     @property
     def drones(self) -> int:

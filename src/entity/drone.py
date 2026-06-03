@@ -103,7 +103,10 @@ class Drone(Entity):
                         next_hub.extra_capacity += 1
 
                 next_hub.land_on()
-                self._edge = edge
+                if edge.original:
+                    self._edge = edge.original
+                else:
+                    self._edge = edge
                 next_hub.is_reserved = True
                 self._reserved_hub = next_hub
                 next_hub = self._create_temp_hub(next_hub)
@@ -121,9 +124,16 @@ class Drone(Entity):
         self._next_x, self._next_y = next_hub.pos
         self._hub.take_off()
 
-        edge.drones += 1
+        if edge.original:
+            edge.original.drones += 1
+        else:
+            edge.drones += 1
+
         if not self._reserved_hub and change_edge:
-            self._edge = edge
+            if edge.original:
+                self._edge = edge.original
+            else:
+                self._edge = edge
 
         if self._hub.extra_capacity > 0 and not self._reserved_hub:
             self._hub.extra_capacity -= 1
