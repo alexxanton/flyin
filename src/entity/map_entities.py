@@ -55,9 +55,16 @@ class Edge:
             "restricted": 2,
             "blocked": 3
         }
-        value = values[self._to_hub.zone] - (self._to_hub._drones_landed == 0)
-        value -= self.has_capacity() * 2
-        return value < values[other._to_hub.zone]
+
+        def get_value(edge: Edge) -> int:
+            """Get the priority value to sort edges."""
+            value = values[edge._to_hub.zone]
+            #value -= (self._to_hub._drones_landed == 0)
+            value -= edge.has_capacity() * 2
+            value -= edge._to_hub._drones_landed == 0
+            return value
+
+        return get_value(self) < get_value(other)
 
 
 class Hub(Entity):
