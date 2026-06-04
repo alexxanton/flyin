@@ -7,7 +7,7 @@ import re
 
 class Parser:
     DRONE_GRAMMAR = r"""
-        start: nb_drones _nl* line+
+        start: _nl* nb_drones _nl* line+
 
         ?line: (hub_line | connection_line) _nl
 
