@@ -17,16 +17,29 @@ class Parser:
 
         metadata: attributes?
         name_coord: NAME SIGNED_INT SIGNED_INT
-        attributes: "[" pair (pair)* "]"
-        pair: NAME "=" (NAME | SIGNED_INT)
+        attributes: (hub_attr | connection_attr)
+
+        hub_attr: "[" hub_pair+ "]"
+        connection_attr: "[" connection_pair+ "]"
+        hub_pair: (hub_str_pair | hub_int_pair)
+
+        hub_str_pair: HUB_META_STR "=" NAME
+        hub_int_pair: HUB_META_INT "=" INT
+        connection_pair: CONNECTION_META "=" INT
 
         HUB_TYPE: "start_hub" | "end_hub" | "hub"
+        HUB_META_STR: "zone" | "color"
+        HUB_META_INT: "max_drones"
+        CONNECTION_META: "max_link_capacity"
+
+        ZONE: "normal" | "restricted" | "priority" | "blocked"
         NAME: /[a-zA-Z0-9_]+/
         COMMENT: /#[^\n]*/
         NEWLINE: /\r?\n+/
         _nl: (NEWLINE | COMMENT)
 
         %import common.SIGNED_INT
+        %import common.INT
         %import common.WS_INLINE
         %ignore COMMENT
         %ignore WS_INLINE
@@ -82,6 +95,7 @@ class Parser:
             sys.exit(self._format_error(e, data))
         except Exception as e:
             sys.exit(str(e))
+            #raise
 
         for item in parsed_data:
             print(item)

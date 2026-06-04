@@ -58,12 +58,21 @@ class DroneTransformer(Transformer):
 
         return {"type": hub_type, "params": args[1], "metadata": meta}
 
-    def pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+    def hub_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
-        return (
-            str(args[0]),
-            int(args[1]) if args[1].lstrip("-").isnumeric() else str(args[1])
-        )
+        return args[0]
+
+    def hub_str_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+        """Defines how to return pair."""
+        return (str(args[0]), str(args[1]))
+
+    def hub_int_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+        """Defines how to return pair."""
+        return (str(args[0]), int(args[1]))
+
+    def connection_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+        """Defines how to return pair."""
+        return (str(args[0]), int(args[1]))
 
     def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
         """Defines how to return metadata."""
@@ -71,12 +80,23 @@ class DroneTransformer(Transformer):
             return {}
         return dict(args[0])
 
-    def attributes(self, args: List[Any]) -> Dict[str, Any]:
+    def hub_attr(self, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return attributes."""
         attrs = {}
         for k, v in args:
             attrs[k] = v
         return attrs
+
+    def connection_attr(self, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return attributes."""
+        attrs = {}
+        for k, v in args:
+            attrs[k] = v
+        return attrs
+
+    def attributes(self, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return attributes."""
+        return args[0]
 
     def connection_line(self, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return connection_line."""
