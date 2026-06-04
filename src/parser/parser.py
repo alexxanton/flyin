@@ -2,6 +2,7 @@ from lark import Lark, UnexpectedToken
 from typing import List, Dict, Any, Union, cast
 from .transformer import DroneTransformer
 import sys
+import re
 
 
 class Parser:
@@ -23,7 +24,7 @@ class Parser:
         NAME: /[a-zA-Z0-9_]+/
         COMMENT: /#[^\n]*/
         NEWLINE: /\r?\n+/
-        _nl: (NEWLINE | (COMMENT NEWLINE))
+        _nl: (NEWLINE | COMMENT)
 
         %import common.SIGNED_INT
         %import common.WS_INLINE
@@ -57,6 +58,17 @@ class Parser:
                 data = f.read()
         except OSError as e:
             sys.exit(str(e))
+
+        lines = data.splitlines()
+        formatted_lines = []
+        for line in lines:
+            line = re.sub(r"^\s+", "", line)
+            line = re.sub(r"\s+", " ", line)
+            if line.startswith("#"):
+                line = ""
+            formatted_lines.append(line)
+        data = "\n".join(formatted_lines) + "\n"
+        print(data)
 
         parser = Lark(
             self.DRONE_GRAMMAR, parser="lalr", transformer=DroneTransformer()
