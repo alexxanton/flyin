@@ -84,12 +84,17 @@ class Parser:
         print(data)
 
         parser = Lark(
-            self.DRONE_GRAMMAR, parser="lalr", transformer=DroneTransformer()
+            self.DRONE_GRAMMAR,
+            parser="lalr",
+            propagate_positions=True,
         )
 
         try:
+            tree = parser.parse(data)
+            transformer = DroneTransformer()
+            d = transformer.transform(tree)
             parsed_data = cast(
-                List[Dict[str, Union[int, str]]], parser.parse(data)
+                List[Dict[str, Union[int, str]]], d
             )
         except UnexpectedToken as e:
             sys.exit(self._format_error(e, data))

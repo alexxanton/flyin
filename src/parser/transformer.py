@@ -1,7 +1,9 @@
-from lark import Transformer
+from lark import Transformer, v_args
+from lark.tree import Meta
 from typing import List, Dict, Tuple, Set, Any, Union
 
 
+@v_args(meta=True)
 class DroneTransformer(Transformer):
     """Parser transformer for the drone network."""
     def __init__(self) -> None:
@@ -17,7 +19,7 @@ class DroneTransformer(Transformer):
             "zone", "color", "max_drones"
         }
 
-    def nb_drones(self, args: List[Any]) -> Dict[str, int]:
+    def nb_drones(self, pmeta: Meta, args: List[Any]) -> Dict[str, int]:
         """Defines how to return nb_drones."""
         val = int(args[0])
         if val < 0:
@@ -25,7 +27,7 @@ class DroneTransformer(Transformer):
         self._nb_drones = val
         return {"nb_drones": val}
 
-    def name_coord(self, args: List[Any]) -> Tuple[str, int, int]:
+    def name_coord(self, pmeta: Meta, args: List[Any]) -> Tuple[str, int, int]:
         """Defines how to return name_coord."""
         name, x, y = str(args[0]), int(args[1]), int(args[2])
         if name in self._hub_names:
@@ -33,7 +35,7 @@ class DroneTransformer(Transformer):
         self._hub_names.add(name)
         return name, x, -y
 
-    def hub_line(self, args: List[Any]) -> Dict[str, Any]:
+    def hub_line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return hub_line."""
         hub_type = str(args[0])
         meta = args[2]
@@ -58,47 +60,47 @@ class DroneTransformer(Transformer):
 
         return {"type": hub_type, "params": args[1], "metadata": meta}
 
-    def hub_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+    def hub_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
         return args[0]
 
-    def hub_str_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+    def hub_str_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
         return (str(args[0]), str(args[1]))
 
-    def hub_int_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+    def hub_int_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
         return (str(args[0]), int(args[1]))
 
-    def connection_pair(self, args: List[Any]) -> Tuple[str, Union[int, str]]:
+    def connection_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, Union[int, str]]:
         """Defines how to return pair."""
         return (str(args[0]), int(args[1]))
 
-    def metadata(self, args: List[Any]) -> Dict[str, Union[int, str]]:
+    def metadata(self, pmeta: Meta, args: List[Any]) -> Dict[str, Union[int, str]]:
         """Defines how to return metadata."""
         if not args:
             return {}
         return dict(args[0])
 
-    def hub_attr(self, args: List[Any]) -> Dict[str, Any]:
+    def hub_attr(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return attributes."""
         attrs = {}
         for k, v in args:
             attrs[k] = v
         return attrs
 
-    def connection_attr(self, args: List[Any]) -> Dict[str, Any]:
+    def connection_attr(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return attributes."""
         attrs = {}
         for k, v in args:
             attrs[k] = v
         return attrs
 
-    def attributes(self, args: List[Any]) -> Dict[str, Any]:
+    def attributes(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return attributes."""
         return args[0]
 
-    def connection_line(self, args: List[Any]) -> Dict[str, Any]:
+    def connection_line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return connection_line."""
         from_hub, to_hub = str(args[0]), str(args[1])
         for hub in [from_hub, to_hub]:
@@ -119,9 +121,9 @@ class DroneTransformer(Transformer):
             "metadata": meta
         }
 
-    def start(self, args: List[Any]) -> List[Any]:
+    def start(self, pmeta: Meta, args: List[Any]) -> List[Any]:
         """Defines how to return start."""
         return args
 
-    def line(self, args: List[Any]) -> Dict[str, Any]:
+    def line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         return dict(args[0])
