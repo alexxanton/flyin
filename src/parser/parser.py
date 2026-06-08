@@ -12,27 +12,31 @@ class Parser:
         ?line: (hub_line | connection_line) _nl
 
         nb_drones: "nb_drones:" SIGNED_INT _nl
-        hub_line: HUB_TYPE ":" name_coord metadata
-        connection_line: "connection:" NAME "-" NAME metadata
+        hub_line: HUB_TYPE ":" name_coord hub_metadata
+        connection_line: "connection:" NAME "-" NAME conn_metadata
 
-        metadata: attributes?
+        hub_metadata: hub_attributes?
+        conn_metadata: conn_attributes?
         name_coord: NAME SIGNED_INT SIGNED_INT
-        attributes: (hub_attr | connection_attr)
+        hub_attributes: hub_attr
+        conn_attributes: connection_attr
 
-        hub_attr: "[" hub_pair+ "]"
-        connection_attr: "[" connection_pair+ "]"
-        hub_pair: (hub_str_pair | hub_int_pair)
+        hub_attr: "[" hub_options+ "]"
+        connection_attr: "[" connection_pair "]"
+        hub_options: (color_pair | max_pair | zone_pair)
 
-        hub_str_pair: HUB_META_STR "=" NAME
-        hub_int_pair: HUB_META_INT "=" INT
-        connection_pair: CONNECTION_META "=" INT
+        color_pair: COLOR "=" WORD
+        max_pair: MAX_DRONES "=" INT
+        zone_pair: ZONE "=" ZONES
+        connection_pair: MAX_LINK "=" INT
 
         HUB_TYPE: "start_hub" | "end_hub" | "hub"
-        HUB_META_STR: "zone" | "color"
-        HUB_META_INT: "max_drones"
-        CONNECTION_META: "max_link_capacity"
+        ZONE: "zone"
+        COLOR: "color"
+        MAX_DRONES: "max_drones"
+        MAX_LINK: "max_link_capacity"
 
-        ZONE: "normal" | "restricted" | "priority" | "blocked"
+        ZONES: "normal" | "restricted" | "priority" | "blocked"
         NAME: /[a-zA-Z0-9_]+/
         COMMENT: /#[^\n]*/
         NEWLINE: /\r?\n+/
@@ -40,6 +44,7 @@ class Parser:
 
         %import common.SIGNED_INT
         %import common.INT
+        %import common.WORD
         %import common.WS_INLINE
         %ignore COMMENT
         %ignore WS_INLINE
@@ -49,17 +54,27 @@ class Parser:
         """Format the error message to make it user-friendly."""
         TOKEN_HINTS = {
             "SIGNED_INT": "a number",
+            "INT": "a positive number",
             "NAME": "hub name",
             "EQUAL": "=",
+            "COLON": ":",
+            "ZONE": "zone",
+            "COLOR": "color",
+            "MAX_DRONES": "max_drones",
+            "MAX_LINK": "max_link_capacity",
+            "ZONES": "normal | restricted | priority | blocked",
+            "HUB_TYPE": "start_hub | end_hub | hub"
         }
 
-        expected = ", ".join(sorted(e.expected)) if e.expected else ""
+        expected = "\n  " + "\n  ".join([
+            f"{TOKEN_HINTS.get(e, e)!r}" for e in sorted(e.expected)
+        ])
 
         return (
-            f"\nSyntax error at line {e.line}, column {e.column}:\n"
+            f"\nSyntax error at line {e.line}:\n"
             f"{text.splitlines()[e.line - 1]}\n"
             f"{'^':>{e.column}}\n"
-            f"Expected: {TOKEN_HINTS.get(expected, e.expected)}\n"
+            f"Expected: {expected}\n"
             f"Found: {e.token.value!r}\n"
         )
 
