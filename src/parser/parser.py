@@ -118,7 +118,6 @@ class Parser:
             sys.exit(self._format_error(e, data))
         except Exception as e:
             sys.exit(str(e))
-            #raise
 
         for item in parsed_data:
             print(item)
