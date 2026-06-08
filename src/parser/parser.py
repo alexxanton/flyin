@@ -53,11 +53,14 @@ class Parser:
     def _format_error(self, e: UnexpectedToken, text: str) -> str:
         """Format the error message to make it user-friendly."""
         TOKEN_HINTS = {
+            "__ANON_0": "nb_drones",
             "SIGNED_INT": "a number",
             "INT": "a positive number",
             "NAME": "hub name",
             "EQUAL": "=",
             "COLON": ":",
+            "LSQB": "[",
+            "RSQB": "]",
             "ZONE": "zone",
             "COLOR": "color",
             "MAX_DRONES": "max_drones",
@@ -96,7 +99,6 @@ class Parser:
                 line = ""
             formatted_lines.append(line)
         data = "\n".join(formatted_lines) + "\n"
-        print(data)
 
         parser = Lark(
             self.DRONE_GRAMMAR,

@@ -107,6 +107,13 @@ class DroneTransformer(Transformer):
 
     def hub_attr(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
         """Defines how to return attributes."""
+        seen = set()
+
+        for key, value in args:
+            if key in seen:
+                raise ParseError(f"Duplicate attribute: {key}", pmeta.line)
+            seen.add(key)
+
         attrs = {}
         for k, v in args:
             attrs[k] = v
