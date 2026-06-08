@@ -59,9 +59,8 @@ class Edge:
         def get_value(edge: Edge) -> int:
             """Get the priority value to sort edges."""
             value = values[edge._to_hub.zone]
-            #value -= (self._to_hub._drones_landed == 0)
-            value -= edge.has_capacity() * 2
-            value -= edge._to_hub._drones_landed == 0
+            value -= edge.has_capacity()
+            value -= (edge._to_hub.drones_landed == 0) * 2
             return value
 
         return get_value(self) < get_value(other)
