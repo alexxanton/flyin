@@ -54,6 +54,7 @@ class Parser:
         """Format the error message to make it user-friendly."""
         TOKEN_HINTS = {
             "__ANON_0": "nb_drones",
+            "__ANON_1": "connection",
             "SIGNED_INT": "a number",
             "INT": "a positive number",
             "NAME": "hub name",
