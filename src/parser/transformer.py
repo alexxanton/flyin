@@ -16,7 +16,7 @@ class DroneTransformer(Transformer):
         """Initialize the transformer."""
         self._nb_drones = 0
         self._hub_names: Set[str] = set()
-        self._hub_positions: Set[int] = set()
+        self._hub_positions: Set[Tuple[int, int]] = set()
         self._connections: Set[Tuple[str, str]] = set()
         self._start_found = False
         self._end_found = False

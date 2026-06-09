@@ -52,7 +52,7 @@ class Renderer:
 
     def _load_hub_sprites(self) -> Dict[str, pygame.Surface]:
         """Load hub sprites from folder as a dict."""
-        path = Path("src/renderer/sprites/hub_sprites")
+        path = Path("sprites/hub_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return {
             file.stem: pygame.image.load(file).convert_alpha()
@@ -61,7 +61,7 @@ class Renderer:
 
     def _load_sprites(self, name: str) -> List[pygame.Surface]:
         """Load any sprites from folder as a list."""
-        path = Path(f"src/renderer/sprites/{name}_sprites")
+        path = Path(f"sprites/{name}_sprites")
         files: List[Path] = sorted(path.glob("*.png"))
         return [
             pygame.image.load(file).convert_alpha()
