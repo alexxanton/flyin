@@ -18,6 +18,8 @@ class DroneTransformer(Transformer):
         self._hub_names: Set[str] = set()
         self._hub_positions: Set[int] = set()
         self._connections: Set[Tuple[str, str]] = set()
+        self._start_found = False
+        self._end_found = False
         self._valid_zones: Set[str] = {
             "normal", "blocked", "restricted", "priority"
         }
@@ -40,7 +42,10 @@ class DroneTransformer(Transformer):
         name, x, y = str(args[0]), int(args[1]), int(args[2])
         if name in self._hub_names:
             raise ParseError(f"Duplicate zone name: {name}", pmeta.line)
+        if (x, y) in self._hub_positions:
+            raise ParseError(f"Duplicate zone position: {name}", pmeta.line)
         self._hub_names.add(name)
+        self._hub_positions.add((x, y))
         return name, x, -y
 
     def hub_line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
@@ -66,11 +71,19 @@ class DroneTransformer(Transformer):
                     "{hub_type}: Max drones quantity doesn't match",
                     pmeta.line
                 )
+            if hub_type == "start_hub":
+                if self._start_found:
+                    raise ParseError("start_hub is duplicated", pmeta.line)
+                self._start_found = True
+            if hub_type == "end_hub":
+                if self._end_found:
+                    raise ParseError("end_hub is duplicated", pmeta.line)
+                self._end_found = True
 
         return {"type": hub_type, "params": args[1], "metadata": meta}
 
     def hub_options(self, pmeta: Meta, args: List[Any]) -> Any:
-        """Defines how to return hub_pair."""
+        """Defines how to return hub_options."""
         return args[0]
 
     def color_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, str]:
@@ -78,7 +91,7 @@ class DroneTransformer(Transformer):
         return (str(args[0]), str(args[1]))
 
     def zone_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, str]:
-        """Defines how to return color_pair."""
+        """Defines how to return zone_pair."""
         return (str(args[0]), str(args[1]))
 
     def max_pair(self, pmeta: Meta, args: List[Any]) -> Tuple[str, int]:
@@ -92,7 +105,7 @@ class DroneTransformer(Transformer):
     def hub_metadata(
         self, pmeta: Meta, args: List[Any]
     ) -> Dict[str, Union[int, str]]:
-        """Defines how to return metadata."""
+        """Defines how to return hub_metadata."""
         if not args:
             return {}
         return dict(args[0])
@@ -100,13 +113,13 @@ class DroneTransformer(Transformer):
     def conn_metadata(
         self, pmeta: Meta, args: List[Any]
     ) -> Dict[str, Union[int, str]]:
-        """Defines how to return metadata."""
+        """Defines how to return conn_metadata."""
         if not args:
             return {}
         return dict(args[0])
 
     def hub_attr(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
-        """Defines how to return attributes."""
+        """Defines how to return hub_attr."""
         seen = set()
 
         for key, value in args:
@@ -120,18 +133,18 @@ class DroneTransformer(Transformer):
         return attrs
 
     def connection_attr(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
-        """Defines how to return attributes."""
+        """Defines how to return connection_attr."""
         attrs = {}
         for k, v in args:
             attrs[k] = v
         return attrs
 
     def hub_attributes(self, pmeta: Meta, args: List[Any]) -> Any:
-        """Defines how to return attributes."""
+        """Defines how to return hub_attributes."""
         return args[0]
 
     def conn_attributes(self, pmeta: Meta, args: List[Any]) -> Any:
-        """Defines how to return attributes."""
+        """Defines how to return conn_attributes."""
         return args[0]
 
     def connection_line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
@@ -163,4 +176,5 @@ class DroneTransformer(Transformer):
         return args
 
     def line(self, pmeta: Meta, args: List[Any]) -> Dict[str, Any]:
+        """Defines how to return line."""
         return dict(args[0])
